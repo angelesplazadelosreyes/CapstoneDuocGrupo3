@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DCP{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">DCP</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#loginModal">Iniciar Sesión</button>
+                    </li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="/users/register/">Register</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <!-- Modal de Inicio de Sesión -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                    </form>
+                    <p class="mt-2">
+                        ¿Olvidaste tu contraseña? <a href="#" data-toggle="modal" data-target="#forgotPasswordModal" data-dismiss="modal">Haz clic aquí para recuperarla</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<!-- Modal de Recuperación de Contraseña -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Recuperar Contraseña</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="passwordResetForm" method="post" action="{% url 'custom_password_reset' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="username">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar Enlace de Recuperación</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('passwordResetForm').onsubmit = function(event) {
+            event.preventDefault();
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Se ha enviado un enlace de recuperación al correo: ${data.email}`);
+                    $('#forgotPasswordModal').modal('hide');
+                } else {
+                    alert('Error al procesar la solicitud. Verifique el nombre de usuario.');
+                }
+            });
+        };
+    </script>
+    
+
+
+</body>
+</html>
