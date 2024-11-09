@@ -42,7 +42,7 @@ def login_view(request):
                 return redirect('dashboard')  # Redirige a la vista para usuarios registrados
             else:
                 messages.error(request, 'Invalid username or password')
-    return render(request, 'users/login.html', {'form': form})
+    return render(request, 'users/dashboard.html', {'form': form})
 
 
 
@@ -93,3 +93,5 @@ def custom_password_reset(request):
         except User.DoesNotExist:
             return JsonResponse({'success': False})
     return JsonResponse({'success': False})
+
+
