@@ -31,6 +31,18 @@ services:
     networks:
       - dcp_network
 
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: mplazadelosreyes@gmail.com  
+      PGADMIN_DEFAULT_PASSWORD: 12345         
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - dcp_network
+
 volumes:
   postgres_data:
 

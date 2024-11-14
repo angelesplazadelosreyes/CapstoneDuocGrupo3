@@ -1,8 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}LungSafe - Bienvenida{% endblock %}
 
 {% block content %}
-    <h2>Bienvenido a DCP</h2>
-    <p>Esta es la página de inicio. Y este bloque es propio del home</p>
+        <div class="container vh-100 d-flex justify-content-center align-items-center position-relative">
+            <!-- Cuadro de bienvenida -->
+            <div class="welcome-box shadow-lg p-5 rounded">
+                <h1 class="text-primary text-center">Bienvenido a LungSafe</h1>
+                <p class="text-muted text-center">Tu identificador de Cáncer Pulmonar</p>
+                <p class="text-center">Diagnóstico temprano para mejorar tu calidad de vida. Haciendo este rápido análisis puedes saber la probabilidad de padecer esta enfermedad.</p>
+                <div class="text-center">
+                    <a href="{% url 'core:patient_data_form' %}" class="btn btn-success btn-lg">Empezar</a>
+                </div>
+            </div>
+        </div>
 {% endblock %}
