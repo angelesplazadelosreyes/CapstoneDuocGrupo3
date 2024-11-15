@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import UserRegisterForm, UserLoginForm
+from .forms import UserRegisterForm, CustomAuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
@@ -14,8 +14,9 @@ from django.contrib.auth.forms import AuthenticationForm
 import re
 
 def home(request):
-    login_form = UserLoginForm()
-    return render(request, 'home.html', {'form': login_form})
+    return render(request, 'home.html')
+
+
 
 def register(request):
     if request.method == 'POST':
@@ -31,7 +32,7 @@ def register(request):
 
 
 def login_view(request):
-    form = AuthenticationForm(request, data=request.POST or None)
+    form = CustomAuthenticationForm(request, data=request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
             username = form.cleaned_data.get('username')
@@ -39,15 +40,13 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home')  # Redirige al home después de un inicio exitoso
+                return redirect('dashboard')
         messages.error(request, 'Nombre de usuario o contraseña incorrectos')
-        return render(request, 'home.html', {'form': form})
-
     return render(request, 'home.html', {'form': form})
 
 
 
-
+@login_required
 def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('home')  

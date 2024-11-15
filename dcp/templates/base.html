@@ -38,29 +38,31 @@
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Modal de Inicio de Sesión -->
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="post" action="{% url 'login' %}">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-                    </form>
-                    <p class="mt-2">
-                        ¿Olvidaste tu contraseña? <a href="#" data-toggle="modal" data-target="#forgotPasswordModal" data-dismiss="modal">Haz clic aquí para recuperarla</a>
-                    </p>
-                </div>
+<!-- Modal de Inicio de Sesión -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    {{ login_form.as_p }}
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </form>
+                
+                <p class="mt-2">
+                    ¿Olvidaste tu contraseña? <a href="#" data-toggle="modal" data-target="#forgotPasswordModal" data-dismiss="modal">Haz clic aquí para recuperarla</a>
+                </p>
             </div>
         </div>
     </div>
+</div>
+
 
     <!-- Modal para Restablecer Contraseña -->
     <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
