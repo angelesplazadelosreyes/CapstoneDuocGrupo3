@@ -38,6 +38,7 @@
         {% block content %}{% endblock %}
     </div>
 
+
 <!-- Modal de Inicio de Sesión -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -49,7 +50,10 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="post" action="{% url 'login' %}">
+                <!-- Contenedor de mensajes de error -->
+                <div id="loginErrorMessage" class="alert alert-danger" style="display: none;"></div>
+                
+                <form id="loginForm" method="post" action="{% url 'login' %}">
                     {% csrf_token %}
                     {{ login_form.as_p }}
                     <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
@@ -62,6 +66,7 @@
         </div>
     </div>
 </div>
+
 
 
     <!-- Modal para Restablecer Contraseña -->
@@ -100,6 +105,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/login.js' %}"></script>
 
 </body>
 </html>

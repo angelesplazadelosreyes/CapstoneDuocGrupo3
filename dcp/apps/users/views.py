@@ -11,6 +11,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import AuthenticationForm
+from django.urls import reverse
 import re
 
 def home(request):
@@ -33,17 +34,21 @@ def register(request):
 
 def login_view(request):
     form = CustomAuthenticationForm(request, data=request.POST or None)
-    if request.method == 'POST':
+
+    # Verifica si la solicitud es AJAX
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.method == 'POST':
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('dashboard')
-        messages.error(request, 'Nombre de usuario o contraseña incorrectos')
-    return render(request, 'home.html', {'form': form})
+                return JsonResponse({'success': True, 'redirect_url': reverse('dashboard')})  # Redirige al dashboard si es exitoso
+        # Si no es válido o las credenciales son incorrectas
+        return JsonResponse({'success': False, 'error': 'Nombre de usuario o contraseña incorrectos'})
 
+    # Renderiza el formulario normalmente si no es una solicitud AJAX
+    return render(request, 'home.html', {'form': form})
 
 
 @login_required
