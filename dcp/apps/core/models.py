@@ -8,8 +8,7 @@ class PatientData(models.Model):
         (0, 'Femenino'),
     ]
 
-    GENDER = models.CharField(
-    max_length=1,
+    GENDER = models.IntegerField(
     choices=GENDER_CHOICES,
     default=1,  # Valor predeterminado: Male
     null=False,  # No permite valores nulos en la base de datos
@@ -34,7 +33,7 @@ class PatientData(models.Model):
     SHORTNESS_OF_BREATH = models.BooleanField()
     SWALLOWING_DIFFICULTY = models.BooleanField()
     CHEST_PAIN = models.BooleanField()
-    LUNG_CANCER = models.BooleanField()
+    LUNG_CANCER = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Patient Data - Age: {self.AGE}, Gender: {self.GENDER}"

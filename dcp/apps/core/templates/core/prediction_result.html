@@ -7,7 +7,7 @@
     <h2>Resultados de la Predicción</h2>
     <p><strong>Resultado de la predicción:</strong> {% if prediction_result == 1 %}Positivo{% else %}Negativo{% endif %}</p>
     <p><strong>Probabilidad de cáncer de pulmón:</strong> {{ prediction_proba|floatformat:2 }}%</p>
-    <a href="{% url 'core:patient_data_form' %}" class="btn btn-primary">Volver</a>
+    <a href="{% url 'core:patient_data_form_fast' %}" class="btn btn-primary">Volver</a>
 </div>
 {% endblock %}
 

@@ -71,40 +71,46 @@ def patient_data_form_fast(request):
         print("Modelo no encontrado. Asegúrate de que el archivo 'modelo_random_forest.pkl' esté en la carpeta correcta.")
 
     if request.method == 'POST':
+        print("Datos enviados desde el formulario:", request.POST)
         form = PatientDataForm(request.POST)
         if form.is_valid() and model:
+            #control z
+            print("Formulario válido. Datos limpios:", form.cleaned_data)
             # Guardar datos en la base de datos
-            patient_data = form.save()
+            if model:
+                patient_data = form.save()
 
-            # Preparar datos para la predicción
-            data = np.array([[  
-                patient_data.GENDER,  # Ya es numérico en la base de datos
-                patient_data.AGE,
-                patient_data.SMOKING,
-                patient_data.YELLOW_FINGERS,
-                patient_data.ANXIETY,
-                patient_data.PEER_PRESSURE,
-                patient_data.CHRONIC_DISEASE,
-                patient_data.FATIGUE,
-                patient_data.ALLERGY,
-                patient_data.WHEEZING,
-                patient_data.ALCOHOL_CONSUMING,
-                patient_data.COUGHING,
-                patient_data.SHORTNESS_OF_BREATH,
-                patient_data.SWALLOWING_DIFFICULTY,
-                patient_data.CHEST_PAIN
-            ]])
+                # Preparar datos para la predicción
+                data = np.array([[  
+                    patient_data.GENDER,  # Ya es numérico en la base de datos
+                    patient_data.AGE,
+                    patient_data.SMOKING,
+                    patient_data.YELLOW_FINGERS,
+                    patient_data.ANXIETY,
+                    patient_data.PEER_PRESSURE,
+                    patient_data.CHRONIC_DISEASE,
+                    patient_data.FATIGUE,
+                    patient_data.ALLERGY,
+                    patient_data.WHEEZING,
+                    patient_data.ALCOHOL_CONSUMING,
+                    patient_data.COUGHING,
+                    patient_data.SHORTNESS_OF_BREATH,
+                    patient_data.SWALLOWING_DIFFICULTY,
+                    patient_data.CHEST_PAIN
+                ]])
 
-            # Realizar la predicción
-            prediction_result = model.predict(data)[0]
-            prediction_proba = model.predict_proba(data)[0][1]
+                # Realizar la predicción
+                prediction_result = model.predict(data)[0]
+                prediction_proba = model.predict_proba(data)[0][1]
 
-            # Redirigir a la página de resultados
-            return render(request, 'core/prediction_result.html', {
-                'form': form,
-                'prediction_result': prediction_result,
-                'prediction_proba': prediction_proba
-            })
+                # Redirigir a la página de resultados
+                return render(request, 'core/prediction_result.html', {
+                    'form': form,
+                    'prediction_result': prediction_result,
+                    'prediction_proba': prediction_proba
+                })
+            else:
+                print("Modelo no encontrado. No se puede realizar la predicción.")
 
     return render(request, 'core/patient_data_form_fast.html', {'form': form})
 
