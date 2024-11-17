@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}LungSafe - Evaluación de Riesgo{% endblock %}
+
+{% block content %}
+    <div class="container mt-0" style="margin-top: -40px !important;">
+        <div class="card shadow p-4 mx-auto" style="max-width: 600px;">
+            <h2 class="text-center text-primary">LungSafe: Evaluación de Riesgo</h2>
+            <p class="text-center text-muted">Completa este formulario para proceder al análisis.</p>
+
+            <!-- Pestañas de navegación -->
+            <ul class="nav nav-pills justify-content-center" id="evaluationForm" style="margin-bottom: -10px;" id="evaluationForm">
+                <li class="nav-item">
+                    <a class="nav-link active rounded-3" id="tab-modulo1" data-bs-toggle="pill" href="#modulo1">1</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-3" id="tab-modulo2" data-bs-toggle="pill" href="#modulo2">2</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-3" id="tab-modulo3" data-bs-toggle="pill" href="#modulo3">3</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content mt-2">
+            <!-- Módulo 1 -->
+            <div class="tab-pane fade show active" id="modulo1">
+                <div class="card shadow p-4 mx-auto" style="max-width: 600px;">
+                    <h4 class="text-center text-primary">Edad y Sexo</h4>
+                    <form method="post" action="/patient_data/" id="form-modulo1">
+                        {% csrf_token %}
+            
+                        <!-- Grid layout -->
+                        <div class="row mb-3 align-items-start">
+                            <!-- Edad -->
+                            <div class="col-md-6">
+                                <label for="id_AGE" class="form-label">Ingrese su edad:</label>
+                                {{ form.AGE }}
+                                <small class="form-text text-muted">El estudio se hizo para un rango de edad de entre 21 y 87 años, por lo que si su edad está fuera de este rango use el número más cercano.</small>
+                            </div>
+            
+                            <!-- Sexo -->
+                            <div class="col-md-6 align-self-start">
+                                <label class="form-label">Sexo</label>
+                                <div class="form-check">
+                                    <input type="radio" class="form-check-input" id="gender-female" name="GENDER" value="F">
+                                    <label class="form-check-label" for="gender-female">Femenino</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" class="form-check-input" id="gender-male" name="GENDER" value="M">
+                                    <label class="form-check-label" for="gender-male">Masculino</label>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i></a>
+                            <button type="submit" class="btn btn-primary">Siguiente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            
+            
+
+            <!-- Módulo 2 -->
+            <div class="tab-pane fade" id="modulo2">
+                <div class="card shadow p-4 mx-auto" style="max-width: 600px;">
+                    <h4 class="text-center text-primary">Tabaquismo</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_GENDER" class="form-label">Seleccione su género:</label>
+                            {{ form.GENDER }}
+                        </div>
+                        <div class="d-flex justify-content-around">
+                            <button type="button" class="btn btn-secondary" onclick="nextTab('tab-modulo1')">Atrás</button>
+                            <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i></a>
+                            <button type="button" class="btn btn-primary" onclick="nextTab('tab-modulo3')">Siguiente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Módulo 3 -->
+            <div class="tab-pane fade" id="modulo3">
+                <div class="card shadow p-4 mx-auto" style="max-width: 600px;">
+                    <h4 class="text-center text-primary">Dolor de pecho</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_CHEST_PAIN" class="form-label">¿Siente dolor de pecho?</label>
+                            {{ form.CHEST_PAIN }}
+                        </div>
+                        <div class="d-flex justify-content-around">
+                            <button type="button" class="btn btn-secondary" onclick="nextTab('tab-modulo2')">Atrás</button>
+                            <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i></a>
+                            <button type="submit" class="btn btn-primary">ENVIAR</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/form.js' %}"></script>
+
+
+{% endblock %}

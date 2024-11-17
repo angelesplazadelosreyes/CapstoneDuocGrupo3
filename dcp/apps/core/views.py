@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 import os
 
-def patient_data_form(request):
+def patient_data_form_guided(request):
     form = PatientDataForm()
     prediction_result = None
     prediction_proba = None
@@ -20,23 +20,26 @@ def patient_data_form(request):
     if request.method == 'POST':
         form = PatientDataForm(request.POST)
         if form.is_valid() and model:
-            # Extraer datos del formulario
+            # Guardar datos en la base de datos
+            patient_data = form.save()
+
+            # Preparar datos para la predicción
             data = np.array([[  
-                1 if form.cleaned_data['GENDER'] == 'M' else 0,
-                form.cleaned_data['AGE'],
-                form.cleaned_data['SMOKING'],
-                form.cleaned_data['YELLOW_FINGERS'],
-                form.cleaned_data['ANXIETY'],
-                form.cleaned_data['PEER_PRESSURE'],
-                form.cleaned_data['CHRONIC_DISEASE'],
-                form.cleaned_data['FATIGUE'],
-                form.cleaned_data['ALLERGY'],
-                form.cleaned_data['WHEEZING'],
-                form.cleaned_data['ALCOHOL_CONSUMING'],
-                form.cleaned_data['COUGHING'],
-                form.cleaned_data['SHORTNESS_OF_BREATH'],
-                form.cleaned_data['SWALLOWING_DIFFICULTY'],
-                form.cleaned_data['CHEST_PAIN']
+                patient_data.GENDER,  # Ya es numérico en la base de datos
+                patient_data.AGE,
+                patient_data.SMOKING,
+                patient_data.YELLOW_FINGERS,
+                patient_data.ANXIETY,
+                patient_data.PEER_PRESSURE,
+                patient_data.CHRONIC_DISEASE,
+                patient_data.FATIGUE,
+                patient_data.ALLERGY,
+                patient_data.WHEEZING,
+                patient_data.ALCOHOL_CONSUMING,
+                patient_data.COUGHING,
+                patient_data.SHORTNESS_OF_BREATH,
+                patient_data.SWALLOWING_DIFFICULTY,
+                patient_data.CHEST_PAIN
             ]])
 
             # Realizar la predicción
@@ -50,7 +53,60 @@ def patient_data_form(request):
                 'prediction_proba': prediction_proba
             })
 
-    return render(request, 'core/patient_data_form.html', {'form': form})
+    return render(request, 'core/patient_data_form_guided.html', {'form': form})
+
+
+
+def patient_data_form_fast(request):
+    form = PatientDataForm()
+    prediction_result = None
+    prediction_proba = None
+
+    # Cargar el modelo desde la ruta
+    model_path = os.path.join(os.path.dirname(__file__), 'modelo_random_forest.pkl')
+    try:
+        model = joblib.load(model_path)
+    except FileNotFoundError:
+        model = None
+        print("Modelo no encontrado. Asegúrate de que el archivo 'modelo_random_forest.pkl' esté en la carpeta correcta.")
+
+    if request.method == 'POST':
+        form = PatientDataForm(request.POST)
+        if form.is_valid() and model:
+            # Guardar datos en la base de datos
+            patient_data = form.save()
+
+            # Preparar datos para la predicción
+            data = np.array([[  
+                patient_data.GENDER,  # Ya es numérico en la base de datos
+                patient_data.AGE,
+                patient_data.SMOKING,
+                patient_data.YELLOW_FINGERS,
+                patient_data.ANXIETY,
+                patient_data.PEER_PRESSURE,
+                patient_data.CHRONIC_DISEASE,
+                patient_data.FATIGUE,
+                patient_data.ALLERGY,
+                patient_data.WHEEZING,
+                patient_data.ALCOHOL_CONSUMING,
+                patient_data.COUGHING,
+                patient_data.SHORTNESS_OF_BREATH,
+                patient_data.SWALLOWING_DIFFICULTY,
+                patient_data.CHEST_PAIN
+            ]])
+
+            # Realizar la predicción
+            prediction_result = model.predict(data)[0]
+            prediction_proba = model.predict_proba(data)[0][1]
+
+            # Redirigir a la página de resultados
+            return render(request, 'core/prediction_result.html', {
+                'form': form,
+                'prediction_result': prediction_result,
+                'prediction_proba': prediction_proba
+            })
+
+    return render(request, 'core/patient_data_form_fast.html', {'form': form})
 
 
 

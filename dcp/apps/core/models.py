@@ -1,14 +1,20 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Modelo para el ingreso de datos binarios y la edad
 class PatientData(models.Model):
     GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
+        (1, 'Male'),
+        (0, 'Female'),
     ]
 
     GENDER = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    AGE = models.PositiveIntegerField()
+    AGE = models.PositiveIntegerField(
+        validators=[
+            MinValueValidator(21),
+            MaxValueValidator(87)
+        ]
+    )
     SMOKING = models.BooleanField()
     YELLOW_FINGERS = models.BooleanField()
     ANXIETY = models.BooleanField()
