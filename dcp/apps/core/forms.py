@@ -1,6 +1,9 @@
 from django import forms
 from .models import PatientData
 
+# Define BOOLEAN_CHOICES como una constante global
+BOOLEAN_CHOICES = [(1, 'Sí'), (0, 'No')]
+
 class PatientDataForm(forms.ModelForm):
     class Meta:
         model = PatientData
@@ -8,9 +11,8 @@ class PatientDataForm(forms.ModelForm):
             'GENDER', 'AGE', 'SMOKING', 'YELLOW_FINGERS', 'ANXIETY',
             'PEER_PRESSURE', 'CHRONIC_DISEASE', 'FATIGUE', 'ALLERGY',
             'WHEEZING', 'ALCOHOL_CONSUMING', 'COUGHING', 'SHORTNESS_OF_BREATH',
-            'SWALLOWING_DIFFICULTY', 'CHEST_PAIN', 
+            'SWALLOWING_DIFFICULTY', 'CHEST_PAIN',
         ]
-
         labels = {
             'GENDER': 'Sexo',
             'AGE': 'Edad',
@@ -28,9 +30,11 @@ class PatientDataForm(forms.ModelForm):
             'SWALLOWING_DIFFICULTY': '¿Tiene dificultad para tragar?',
             'CHEST_PAIN': '¿Tiene dolor en el pecho?',
         }
-
         widgets = {
-            'GENDER': forms.RadioSelect(attrs={'class': 'form-check-input',}),
+            'GENDER': forms.RadioSelect(
+                choices=PatientData.GENDER_CHOICES,  
+                attrs={'class': 'form-check-input'}
+            ),
             'AGE': forms.NumberInput(attrs={
                 'class': 'form-control',
                 'style': 'max-width: 100px;',
@@ -39,31 +43,21 @@ class PatientDataForm(forms.ModelForm):
                 'max': '87',
                 'required': 'true',
             }),
-            'SMOKING': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'YELLOW_FINGERS': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'ANXIETY': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'PEER_PRESSURE': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'CHRONIC_DISEASE': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'FATIGUE': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'ALLERGY': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'WHEEZING': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'ALCOHOL_CONSUMING': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'COUGHING': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'SHORTNESS_OF_BREATH': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'SWALLOWING_DIFFICULTY': forms.RadioSelect(attrs={'class': 'form-check-input'}),
-            'CHEST_PAIN': forms.RadioSelect(attrs={'class': 'form-check-input'}),
+            # Uso de BOOLEAN_CHOICES global
+            **{
+                field: forms.RadioSelect(
+                    choices=BOOLEAN_CHOICES,
+                    attrs={'class': 'form-check-input'}
+                )
+                for field in [
+                    'SMOKING', 'YELLOW_FINGERS', 'ANXIETY', 'PEER_PRESSURE',
+                    'CHRONIC_DISEASE', 'FATIGUE', 'ALLERGY', 'WHEEZING',
+                    'ALCOHOL_CONSUMING', 'COUGHING', 'SHORTNESS_OF_BREATH',
+                    'SWALLOWING_DIFFICULTY', 'CHEST_PAIN',
+                ]
+            },
         }
 
-        help_texts = {
-            'AGE': 'Por favor, ingrese un número entero.',
-            # Agrega textos de ayuda para otros campos si es necesario...
-        }
-
-        def clean_GENDER(self):
-            gender = self.cleaned_data.get('GENDER')
-            if not gender:
-                raise forms.ValidationError("Por favor, selecciona tu género.")
-            return gender
-
-
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['GENDER'].initial = 1  # Valor predeterminado: Masculino
