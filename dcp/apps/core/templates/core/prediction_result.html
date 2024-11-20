@@ -21,10 +21,25 @@
                     <strong>Probabilidad de padecer cáncer de pulmón:</strong>
                     {{ prediction_proba|floatformat:2 }}%
                 </p>
+
+                <div>
+                    <h4>Factores de Riesgo Positivos</h4>
+                    {% if positive_factors %}
+                        <ul>
+                            {% for factor in positive_factors %}
+                                <li>{{ factor }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No se detectaron factores de riesgo positivos.</p>
+                    {% endif %}
+                </div>
+                
+
                 <!-- Botones -->
                 <div style="margin-top: 100px;"> <!-- Espacio adicional sobre los botones -->
                     <a href="{% url 'core:patient_data_form_fast' %}" class="btn btn-primary" style="margin-bottom: 10px;">Volver</a>
-                    <a href='#' class="btn btn-primary" style="margin-bottom: 10px; margin-left: 20px;">Descargar resultado</a>
+                    <a href="{% url 'core:download_result' %}" class="btn btn-primary" style="margin-bottom: 10px; margin-left: 20px;">Descargar resultado</a>
                 </div>
             </div>
 
