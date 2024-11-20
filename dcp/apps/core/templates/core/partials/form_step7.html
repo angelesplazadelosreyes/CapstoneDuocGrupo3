@@ -1,0 +1,52 @@
+<div class="tab-pane fade" id="step7" method="post">
+    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
+        <h4 class="text-center text-primary">Síntomas Respiratorios</h4>
+        <form id="form-step7">
+            {% csrf_token %}
+            <!--Preguntas-->
+            <div class="row mb-3 align-items-start justify-content-center">
+                <div class="col-md-5">
+                    <label class="form-label">{{ form.SHORTNESS_OF_BREATH.label }}</label>
+                    {{ form.SHORTNESS_OF_BREATH }}
+                    <br>
+                    <p class="text-muted text-center" style="font-size: small;">Sin importar la cantidad, responda si actualmente consume cigarrillos</p>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-label">{{ form.WHEEZING.label }}</div>
+                    <div class="form-check">
+                        {{ form.WHEEZING }}
+                    </div>
+                    <br>
+                    <div>
+                        <p class="text-muted text-center" style="font-size: small;">Mire los dedos con los que suele tomar el cigarrillo</p>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" onclick="prevTab('step6')">Atrás</button>
+                <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i> Home</a>
+                <button type="submit" class="btn btn-success btn-lg">Enviar</button>
+            </div>
+            
+            <!--Control z-->
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+

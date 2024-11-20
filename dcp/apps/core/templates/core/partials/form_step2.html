@@ -1,0 +1,35 @@
+<div class="tab-pane fade" id="step2" method="post">
+    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
+        <h4 class="text-center text-primary">Tabaquismo</h4>
+        <form id="form-step2">
+            {% csrf_token %}
+            <!--Preguntas-->
+            <div class="row mb-3 align-items-start justify-content-center">
+                <div class="col-md-5">
+                    <label class="form-label">{{ form.SMOKING.label }}</label>
+                    {{ form.SMOKING }}
+                    <br>
+                    <p class="text-muted text-center" style="font-size: small;">Sin importar la cantidad, responda si actualmente consume cigarrillos</p>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-label">{{ form.YELLOW_FINGERS.label }}</div>
+                    <div class="form-check">
+                        {{ form.YELLOW_FINGERS }}
+                    </div>
+                    <br>
+                    <div>
+                        <p class="text-muted text-center" style="font-size: small;">Mire los dedos con los que suele tomar el cigarrillo</p>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" onclick="prevTab('step1')">Atrás</button>
+                <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i> Home</a>
+                <button type="button" class="btn btn-primary" onclick="nextTab('step3')">Siguiente</button>
+            </div>
+        </form>
+    </div>
+</div>

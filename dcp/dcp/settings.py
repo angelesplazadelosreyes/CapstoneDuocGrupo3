@@ -147,3 +147,4 @@ LOGIN_REDIRECT_URL = '/users/dashboard/'
 SESSION_COOKIE_AGE = 30  # Tiempo en segundos (5 minutos)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expira la sesión al cerrar el navegador
 SESSION_SAVE_EVERY_REQUEST = True # Renueva la sesión en cada solicitud
+

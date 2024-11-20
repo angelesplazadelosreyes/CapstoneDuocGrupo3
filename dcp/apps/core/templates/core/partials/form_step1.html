@@ -1,0 +1,33 @@
+<div class="tab-pane fade show active" id="step1">
+    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
+        <h4 class="text-center text-primary">Edad y Sexo</h4>
+        <form id="form-step1" method="post">
+            {% csrf_token %}
+            <!--Preguntas-->
+            <div class="row mb-3 align-items-start justify-content-center">
+                <div class="col-md-5">
+                    <label class="form-label">{{ form.AGE.label }}</label>
+                    {{ form.AGE }}
+                    <br>
+                    <p class="text-muted text-center" style="font-size: small;">Ingrese un número entre 21 y 87, si su edad está fuera de este rango, por favor ingrese el número más cercano</p>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-label">{{ form.GENDER.label }}</div>
+                    <div class="form-check">
+                        {{ form.GENDER }}
+                    </div>
+                    <br>
+                    <div>
+                        <p class="text-muted text-center" style="font-size: small;">Seleccione su género</p>
+                    </div>
+                    
+                </div>
+            </div>
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i> Home</a>
+                <button type="button" class="btn btn-primary" onclick="nextTab('step2')">Siguiente</button>
+            </div>
+        </form>
+    </div>
+</div>

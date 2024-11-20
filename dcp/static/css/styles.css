@@ -85,10 +85,12 @@ form {
 .form-label {
     font-weight: bold;
     color: #007BFF; /* Azul brillante */
+    width: 100%;
 }
 .form-control, .form-select {
     border-radius: 8px;
     border: 1px solid #007BFF;
+    width: 100%;
 }
 .form-control:focus, .form-select:focus {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
@@ -206,6 +208,7 @@ form button, form a {
     padding: 40px;
     width: 100%;
     margin-top: -10px;
+    margin-bottom: 20px;
 }
 
 .form-label {
