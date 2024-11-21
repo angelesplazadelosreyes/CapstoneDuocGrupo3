@@ -37,3 +37,14 @@ class PatientData(models.Model):
 
     def __str__(self):
         return f"Patient Data - Age: {self.AGE}, Gender: {self.GENDER}"
+
+
+# Modelo para el historial de predicciones
+class PredictionHistory(models.Model):
+    image = models.ImageField(upload_to='predictions/')
+    predicted_class = models.CharField(max_length=50)
+    probabilities = models.JSONField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.predicted_class} - {self.created_at}"

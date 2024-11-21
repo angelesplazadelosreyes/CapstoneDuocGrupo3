@@ -1,106 +1,29 @@
-from django.shortcuts import render,redirect
-from .models import PatientData
-from .forms import PatientDataForm
+import os
+import io
 import joblib
 import numpy as np
-import os
+from django.core.files.base import ContentFile
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+
+from .forms import PatientDataForm
+from .models import PredictionHistory
+from .predict_model import predict_tumor_category
 
 
-def patient_data_form_guided(request):
-    """
-    Vista para manejar el formulario de evaluación de riesgo por pasos.
-    Guarda cada paso en el backend y procesa los datos al finalizar.
-    """
-
-    # Paso actual, leído desde los parámetros de la URL
-    current_step = int(request.GET.get('step', 1))  # Paso actual, por defecto es 1
-    total_steps = 7  # Número total de pasos en el formulario
-
-    # Inicializar datos guardados en la sesión (backend)
-    if not request.session.get('patient_data'):
-        request.session['patient_data'] = {}
-        print("Inicializando datos de sesión para patient_data")
-
-    session_data = request.session['patient_data']
-    print(f"Paso actual: {current_step}, Total pasos: {total_steps}")
-    print(f"Datos actuales en la sesión: {session_data}")
-
-    if request.method == 'POST':
-        # Crear el formulario con los datos del POST
-        form = PatientDataForm(request.POST)
-
-        if form.is_valid():
-            # Guardar los datos de este paso en la sesión
-            step_data = form.cleaned_data
-            session_data.update(step_data)
-            request.session['patient_data'] = session_data
-
-            print(f"Datos acumulados en la sesión después del paso {current_step}: {session_data}")
-
-            # Si estamos en el último paso, procesar los datos finales
-            if current_step == total_steps:
-                # Crear una instancia del modelo con todos los datos acumulados
-                final_form = PatientDataForm(session_data)
-                if final_form.is_valid():
-                    # Guardar en la base de datos
-                    final_form.save()
-                    # Limpiar los datos de la sesión
-                    del request.session['patient_data']
-                    print("Datos enviados al modelo y guardados en la base de datos")
-                    print(f"Datos finales procesados: {session_data}")
-                    return redirect('core:success')  # Redirigir a una página de éxito
-                else:
-                    print(f"Errores en el formulario final: {final_form.errors}")
-                    # Si el formulario final no es válido, mostrar errores
-                    return render(request, 'core/patient_data_form_guided.html', {
-                        'form': final_form,
-                        'current_step': current_step,
-                        'total_steps': total_steps,
-                    })
-
-            # Redirigir al siguiente paso
-            next_step = current_step + 1
-            print(f"Redirigiendo al siguiente paso: {next_step}")
-            return redirect(f"{request.path}?step={next_step}")
-
-        else:
-            # Si el formulario tiene errores, renderizar con los errores
-            print(f"Errores en el formulario del paso {current_step}: {form.errors}")
-            return render(request, 'core/patient_data_form_guided.html', {
-                'form': form,
-                'current_step': current_step,
-                'total_steps': total_steps,
-            })
-
-    else:
-        # Si es una solicitud GET, inicializar el formulario con datos existentes
-        initial_data = session_data if current_step > 1 else None
-        form = PatientDataForm(initial=initial_data)
-        print(f"Inicializando formulario con datos: {initial_data}")
-
-        # Renderizar el formulario del paso actual
-        return render(request, 'core/patient_data_form_guided.html', {
-            'form': form,
-            'current_step': current_step,
-            'total_steps': total_steps,
-        })
-
-    # Este punto no debería alcanzarse
-    print("La vista no generó una respuesta válida. Devolviendo un formulario vacío.")
-    return render(request, 'core/patient_data_form_guided.html', {
-        'form': PatientDataForm(),
-        'current_step': current_step,
-        'total_steps': total_steps,
-    })
-
-
-
+### Funciones Auxiliares ###
 
 def generate_pdf_data(patient_data, prediction_result, prediction_proba):
     """
     Genera un diccionario con los datos ingresados por el usuario y los resultados de la predicción.
     """
-    # Factores de riesgo positivos
     factors = [
         ("Fuma", patient_data.SMOKING),
         ("Dedos amarillos", patient_data.YELLOW_FINGERS),
@@ -118,211 +41,119 @@ def generate_pdf_data(patient_data, prediction_result, prediction_proba):
     ]
     positive_factors = [name for name, value in factors if value == 1]
 
-    # Crear el diccionario con todos los datos
-    pdf_data = {
+    return {
         "AGE": patient_data.AGE,
         "GENDER": "Masculino" if patient_data.GENDER == 1 else "Femenino",
         "positive_factors": positive_factors,
         "prediction_result": (
-            "Usted tiene una alta probabilidad de presentar cáncer de pulmón. Le recomendamos que consulte a un médico."
-            if prediction_result == 1
-            else "Es poco probable que usted tenga cáncer de pulmón. Sin embargo, le recomendamos que consulte a un médico si tiene alguna preocupación."
+            "Usted tiene una alta probabilidad de presentar cáncer de pulmón. "
+            "Le recomendamos que consulte a un médico." if prediction_result == 1 else
+            "Es poco probable que usted tenga cáncer de pulmón. Sin embargo, le recomendamos "
+            "que consulte a un médico si tiene alguna preocupación."
         ),
-        "prediction_proba": prediction_proba * 100,  # Formatear a porcentaje con 2 decimales
+        "prediction_proba": prediction_proba * 100,  # Convertir a porcentaje
     }
 
-    return pdf_data
 
+### Vistas Principales ###
+
+def patient_data_form_guided(request):
+    """
+    Vista para manejar el formulario guiado por pasos.
+    """
+    current_step = int(request.GET.get('step', 1))
+    total_steps = 7
+
+    if not request.session.get('patient_data'):
+        request.session['patient_data'] = {}
+        print("Inicializando datos de sesión para patient_data")
+
+    session_data = request.session['patient_data']
+    print(f"Paso actual: {current_step}, Datos en sesión: {session_data}")
+
+    if request.method == 'POST':
+        form = PatientDataForm(request.POST)
+        if form.is_valid():
+            session_data.update(form.cleaned_data)
+            request.session['patient_data'] = session_data
+
+            if current_step == total_steps:
+                final_form = PatientDataForm(session_data)
+                if final_form.is_valid():
+                    final_form.save()
+                    del request.session['patient_data']
+                    return redirect('core:success')
+                else:
+                    return render(request, 'core/patient_data_form_guided.html', {
+                        'form': final_form,
+                        'current_step': current_step,
+                        'total_steps': total_steps,
+                    })
+
+            return redirect(f"{request.path}?step={current_step + 1}")
+        else:
+            print(f"Errores en el formulario: {form.errors}")
+            return render(request, 'core/patient_data_form_guided.html', {
+                'form': form,
+                'current_step': current_step,
+                'total_steps': total_steps,
+            })
+
+    initial_data = session_data if current_step > 1 else None
+    form = PatientDataForm(initial=initial_data)
+    return render(request, 'core/patient_data_form_guided.html', {
+        'form': form,
+        'current_step': current_step,
+        'total_steps': total_steps,
+    })
 
 
 def patient_data_form_fast(request):
+    """
+    Vista para el formulario rápido de datos del paciente.
+    """
     form = PatientDataForm()
-    prediction_result = None
-    prediction_proba = None
-    pdf_data = {}  # Diccionario para almacenar los datos ingresados y la predicción
-
-    # Cargar el modelo desde la ruta
     model_path = os.path.join(os.path.dirname(__file__), 'modelo_random_forest.pkl')
+
     try:
         model = joblib.load(model_path)
     except FileNotFoundError:
+        print("Modelo no encontrado.")
         model = None
-        print("Modelo no encontrado. Asegúrate de que el archivo 'modelo_random_forest.pkl' esté en la carpeta correcta.")
 
     if request.method == 'POST':
-        print("Datos enviados desde el formulario:", request.POST)
         form = PatientDataForm(request.POST)
         if form.is_valid() and model:
-            # Guardar datos en la base de datos
             patient_data = form.save()
 
-            # Preparar datos para la predicción
             data = np.array([[  
-                patient_data.GENDER,  # Ya es numérico en la base de datos
-                patient_data.AGE,
-                patient_data.SMOKING,
-                patient_data.YELLOW_FINGERS,
-                patient_data.ANXIETY,
-                patient_data.PEER_PRESSURE,
-                patient_data.CHRONIC_DISEASE,
-                patient_data.FATIGUE,
-                patient_data.ALLERGY,
-                patient_data.WHEEZING,
-                patient_data.ALCOHOL_CONSUMING,
-                patient_data.COUGHING,
-                patient_data.SHORTNESS_OF_BREATH,
-                patient_data.SWALLOWING_DIFFICULTY,
-                patient_data.CHEST_PAIN
+                patient_data.GENDER, patient_data.AGE, patient_data.SMOKING, patient_data.YELLOW_FINGERS,
+                patient_data.ANXIETY, patient_data.PEER_PRESSURE, patient_data.CHRONIC_DISEASE, patient_data.FATIGUE,
+                patient_data.ALLERGY, patient_data.WHEEZING, patient_data.ALCOHOL_CONSUMING, patient_data.COUGHING,
+                patient_data.SHORTNESS_OF_BREATH, patient_data.SWALLOWING_DIFFICULTY, patient_data.CHEST_PAIN
             ]])
 
-            # Realizar la predicción
             prediction_result = model.predict(data)[0]
             prediction_proba = model.predict_proba(data)[0][1]
 
-            # Generar el diccionario de datos para el PDF
             pdf_data = generate_pdf_data(patient_data, prediction_result, prediction_proba)
+            request.session.update(pdf_data)
 
-            # Guardar datos en la sesión
-            request.session["AGE"] = pdf_data["AGE"]
-            request.session["GENDER"] = pdf_data["GENDER"]
-            request.session["positive_factors"] = pdf_data["positive_factors"]
-            request.session["prediction_result"] = pdf_data["prediction_result"]
-            request.session["prediction_proba"] = pdf_data["prediction_proba"]
-
-            # Redirigir a la página de resultados
             return render(request, 'core/prediction_result.html', {
                 'form': form,
                 'prediction_result': prediction_result,
                 'prediction_proba': prediction_proba * 100,
-                'positive_factors': pdf_data["positive_factors"],  # Enviar factores de riesgo positivos al template
-                'pdf_data': pdf_data,  # Pasar el diccionario al template
+                'positive_factors': pdf_data["positive_factors"],
+                'pdf_data': pdf_data,
             })
-        else:
-            print("Formulario inválido o modelo no encontrado.")
 
     return render(request, 'core/patient_data_form_fast.html', {'form': form})
 
 
-
-
-from django.shortcuts import render
-
-def success_view(request):
-    return render(request, 'core/success.html')
-
-
-import io
-from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.utils import ImageReader
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from reportlab.lib.utils import ImageReader
-
-def download_prediction_result(request):
-    # Recuperar datos de la sesión
-    age = request.session.get("AGE", "N/A")
-    gender = request.session.get("GENDER", "N/A")
-    positive_factors = request.session.get("positive_factors", [])
-    prediction_result = request.session.get("prediction_result", "N/A")
-    prediction_proba = request.session.get("prediction_proba", 0.0)
-
-    # Crear un objeto HttpResponse con contenido PDF
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="resultado_prediccion.pdf"'
-
-    # Crear un PDF con ReportLab
-    buffer = io.BytesIO()
-    pdf = canvas.Canvas(buffer, pagesize=letter)
-
-    # Título del informe
-    pdf.setFont("Helvetica-Bold", 16)
-    pdf.drawString(100, 750, "Informe de Resultados de la Predicción")
-
-    # Datos ingresados
-    pdf.setFont("Helvetica", 12)
-    pdf.drawString(100, 720, f"Edad: {age}")
-    pdf.drawString(100, 700, f"Género: {gender}")
-    pdf.drawString(100, 680, "Factores de riesgo positivos:")
-    y = 660
-    for factor in positive_factors:
-        pdf.drawString(120, y, f"- {factor}")
-        y -= 20
-
-    # Resultado de la predicción con ajuste de texto
-    from reportlab.platypus import Paragraph
-    from reportlab.lib.styles import getSampleStyleSheet
-
-    styles = getSampleStyleSheet()
-    normal_style = styles['Normal']
-
-    prediction_paragraph = Paragraph(f"Resultado de la predicción: {prediction_result}", normal_style)
-    probability_paragraph = Paragraph(f"Probabilidad de padecer cáncer de pulmón: {prediction_proba}%", normal_style)
-
-    prediction_paragraph.wrapOn(pdf, 400, 100)
-    prediction_paragraph.drawOn(pdf, 100, y - 10)
-
-    probability_paragraph.wrapOn(pdf, 400, 100)
-    probability_paragraph.drawOn(pdf, 100, y - 50)
-
-    # Ajustar posición del gráfico
-    y_graph = y - 350
-
-    try:
-        # Convertir `prediction_proba` a float y validar
-        proba_value = float(prediction_proba)
-        if not (0 <= proba_value <= 100):
-            raise ValueError(f"El valor de prediction_proba no está en el rango esperado: {proba_value}")
-
-        # Crear el gráfico
-        from matplotlib.figure import Figure
-        from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-
-        fig = Figure(figsize=(4, 4))
-        ax = fig.add_subplot(111)
-        ax.pie(
-            [proba_value, 100 - proba_value],
-            labels=["Probabilidad", "Resto"],
-            colors=["#007BFF", "#D8D8D8"],
-            autopct='%1.1f%%',
-        )
-        ax.set_title("Probabilidad de Padecer Cáncer")
-
-        # Convertir el gráfico a imagen
-        canvas_graph = FigureCanvas(fig)
-        img_buffer = io.BytesIO()
-        canvas_graph.print_png(img_buffer)
-        img_buffer.seek(0)
-
-        # Añadir el gráfico como imagen al PDF
-        pdf.drawImage(ImageReader(img_buffer), 100, y_graph, width=200, height=200)
-
-    except ValueError as ve:
-        print(f"Error de conversión o rango inválido: {ve}")
-        pdf.drawString(100, y_graph, "Gráfico no disponible: Datos inválidos.")
-    except Exception as e:
-        print(f"Error inesperado al generar el gráfico: {e}")
-        pdf.drawString(100, y_graph, "Gráfico no disponible por datos insuficientes.")
-
-    # Finalizar y guardar el PDF
-    pdf.showPage()
-    pdf.save()
-
-    # Configurar la respuesta
-    buffer.seek(0)
-    response.write(buffer.getvalue())
-    buffer.close()
-
-    return response
-
-
-
-from django.shortcuts import render
-from django.http import JsonResponse
-from .predict_model import predict_tumor_category
-
 def predict_view(request):
+    """
+    Vista para manejar predicciones basadas en imágenes cargadas por el usuario.
+    """
     if request.method == 'POST' and request.FILES.get('image'):
         # Obtener la imagen cargada
         image = request.FILES['image']
@@ -336,11 +167,70 @@ def predict_view(request):
         # Realizar predicción
         result = predict_tumor_category(image_path)
 
+        # Guardar predicción automáticamente en la base de datos
+        PredictionHistory.objects.create(
+            image=image,
+            predicted_class=result['class'],
+            probabilities=result['probabilities'],
+        )
+
         # Eliminar archivo temporal
         os.remove(image_path)
 
-        # Retornar resultado como JSON
-        return JsonResponse(result)
+        # Renderizar resultados
+        return render(request, 'core/predict_results.html', {
+            'class': result['class'],
+            'probabilities': result['probabilities'][0],
+        })
 
     return render(request, 'core/predict.html')
+ 
 
+
+def download_prediction_result(request):
+    """
+    Generar y descargar un PDF con los resultados.
+    """
+    # Recuperar datos de la sesión
+    age = request.session.get("AGE", "N/A")
+    gender = request.session.get("GENDER", "N/A")
+    positive_factors = request.session.get("positive_factors", [])
+    prediction_result = request.session.get("prediction_result", "N/A")
+    prediction_proba = request.session.get("prediction_proba", 0.0)
+
+    # Crear PDF
+    buffer = io.BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    pdf.setFont("Helvetica-Bold", 16)
+    pdf.drawString(100, 750, "Informe de Resultados de la Predicción")
+    pdf.setFont("Helvetica", 12)
+    pdf.drawString(100, 720, f"Edad: {age}")
+    pdf.drawString(100, 700, f"Género: {gender}")
+    pdf.drawString(100, 680, "Factores de riesgo positivos:")
+    y = 660
+    for factor in positive_factors:
+        pdf.drawString(120, y, f"- {factor}")
+        y -= 20
+
+    pdf.drawString(100, y - 10, f"Resultado de la predicción: {prediction_result}")
+    pdf.drawString(100, y - 30, f"Probabilidad de cáncer: {prediction_proba:.2f}%")
+    pdf.showPage()
+    pdf.save()
+
+    buffer.seek(0)
+    return HttpResponse(buffer, content_type='application/pdf')
+
+
+def prediction_history_view(request):
+    """
+    Vista para mostrar el historial de predicciones.
+    """
+    predictions = PredictionHistory.objects.all().order_by('-created_at')
+    return render(request, 'core/history.html', {'predictions': predictions})
+
+
+def success_view(request):
+    """
+    Vista de éxito.
+    """
+    return render(request, 'core/success.html')

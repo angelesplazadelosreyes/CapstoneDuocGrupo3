@@ -9,6 +9,8 @@ urlpatterns = [
     path('success/', views.success_view, name='success'),
     path('download/', views.download_prediction_result, name='download_result'),
     path('predict/', views.predict_view, name='predict'),
+    path('history/', views.prediction_history_view, name='history'),
+
 ]
 
 
