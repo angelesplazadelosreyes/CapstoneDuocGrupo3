@@ -52,7 +52,12 @@
                     <div class="card-body">
                         <img src="{% static 'images/tomografia.png' %}" alt="Icono 3" class="mb-3" style="height: 50px;">
                         <h5 class="card-title text-primary">Imágenes</h5>
-                        <p class="card-text">Solo para usuarios registrados.</p>
+                        {% if user.is_authenticated %}
+                            <p class="card-text">Predicción para imágenes de tomografías pulmonares.</p>
+                            <a href="{% url 'core:predict' %}" class="btn btn-primary">IR</a>
+                        {% else %}
+                            <p class="card-text">Solo para usuarios registrados.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div> 

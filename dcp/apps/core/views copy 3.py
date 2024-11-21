@@ -183,6 +183,9 @@ def predict_view(request):
 
 
 def download_prediction_result(request):
+    """
+    Generar y descargar un PDF con los resultados.
+    """
     # Recuperar datos de la sesión
     age = request.session.get("AGE", "N/A")
     gender = request.session.get("GENDER", "N/A")
@@ -190,19 +193,11 @@ def download_prediction_result(request):
     prediction_result = request.session.get("prediction_result", "N/A")
     prediction_proba = request.session.get("prediction_proba", 0.0)
 
-    # Crear un objeto HttpResponse con contenido PDF
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="resultado_prediccion.pdf"'
-
-    # Crear un PDF con ReportLab
+    # Crear PDF
     buffer = io.BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=letter)
-
-    # Título del informe
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(100, 750, "Informe de Resultados de la Predicción")
-
-    # Datos ingresados
     pdf.setFont("Helvetica", 12)
     pdf.drawString(100, 720, f"Edad: {age}")
     pdf.drawString(100, 700, f"Género: {gender}")
@@ -212,72 +207,13 @@ def download_prediction_result(request):
         pdf.drawString(120, y, f"- {factor}")
         y -= 20
 
-    # Resultado de la predicción con ajuste de texto
-    from reportlab.platypus import Paragraph
-    from reportlab.lib.styles import getSampleStyleSheet
-
-    styles = getSampleStyleSheet()
-    normal_style = styles['Normal']
-
-    prediction_paragraph = Paragraph(f"Resultado de la predicción: {prediction_result}", normal_style)
-    probability_paragraph = Paragraph(f"Probabilidad de padecer cáncer de pulmón: {prediction_proba}%", normal_style)
-
-    prediction_paragraph.wrapOn(pdf, 400, 100)
-    prediction_paragraph.drawOn(pdf, 100, y - 10)
-
-    probability_paragraph.wrapOn(pdf, 400, 100)
-    probability_paragraph.drawOn(pdf, 100, y - 50)
-
-    # Ajustar posición del gráfico
-    y_graph = y - 250
-
-    try:
-        # Convertir prediction_proba a float y validar
-        proba_value = float(prediction_proba)
-        if not (0 <= proba_value <= 100):
-            raise ValueError(f"El valor de prediction_proba no está en el rango esperado: {proba_value}")
-
-        # Crear el gráfico
-        from matplotlib.figure import Figure
-        from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-
-        fig = Figure(figsize=(4, 4))
-        ax = fig.add_subplot(111)
-        ax.pie(
-            [proba_value, 100 - proba_value],
-            labels=["Probabilidad", "Resto"],
-            colors=["#007BFF", "#D8D8D8"],
-            autopct='%1.1f%%',
-        )
-        ax.set_title("Probabilidad de Padecer Cáncer")
-
-        # Convertir el gráfico a imagen
-        canvas_graph = FigureCanvas(fig)
-        img_buffer = io.BytesIO()
-        canvas_graph.print_png(img_buffer)
-        img_buffer.seek(0)
-
-        # Añadir el gráfico como imagen al PDF
-        pdf.drawImage(ImageReader(img_buffer), 100, y_graph, width=200, height=200)
-
-    except ValueError as ve:
-        print(f"Error de conversión o rango inválido: {ve}")
-        pdf.drawString(100, y_graph, "Gráfico no disponible: Datos inválidos.")
-    except Exception as e:
-        print(f"Error inesperado al generar el gráfico: {e}")
-        pdf.drawString(100, y_graph, "Gráfico no disponible por datos insuficientes.")
-
-    # Finalizar y guardar el PDF
+    pdf.drawString(100, y - 10, f"Resultado de la predicción: {prediction_result}")
+    pdf.drawString(100, y - 30, f"Probabilidad de cáncer: {prediction_proba:.2f}%")
     pdf.showPage()
     pdf.save()
 
-    # Configurar la respuesta
     buffer.seek(0)
-    response.write(buffer.getvalue())
-    buffer.close()
-
-    return response
-
+    return HttpResponse(buffer, content_type='application/pdf')
 
 
 def prediction_history_view(request):
