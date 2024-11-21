@@ -9,7 +9,8 @@
             <div class="card-body">
                 <h5 class="card-title text-center">Imagen Cargada</h5>
                 <div class="text-center">
-                    <img src="data:image/jpeg;base64,{{ uploaded_image | safe }}" alt="Uploaded Image" class="img-fluid" style="max-height: 300px;">
+                    <img src="{{ uploaded_image_url }}" alt="Uploaded Image" class="img-fluid" style="max-height: 300px;">
+
                 </div>
                 <h5 class="mt-4">Categoría Predicha: <span class="text-primary">{{ class }}</span></h5>
                 <h6>Probabilidades:</h6>

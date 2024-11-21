@@ -157,34 +157,29 @@ def predict_view(request):
     if request.method == 'POST' and request.FILES.get('image'):
         # Obtener la imagen cargada
         image = request.FILES['image']
-        image_path = f"/tmp/{image.name}"
 
-        # Guardar temporalmente la imagen
-        with open(image_path, 'wb+') as f:
-            for chunk in image.chunks():
-                f.write(chunk)
+        # Convertir la imagen en un objeto BytesIO
+        image_bytes = io.BytesIO(image.read())
 
         # Realizar predicción
-        result = predict_tumor_category(image_path)
+        result = predict_tumor_category(image_bytes)  # Pasar BytesIO en lugar de InMemoryUploadedFile
 
         # Guardar predicción automáticamente en la base de datos
-        PredictionHistory.objects.create(
+        prediction = PredictionHistory.objects.create(
             image=image,
             predicted_class=result['class'],
             probabilities=result['probabilities'],
         )
 
-        # Eliminar archivo temporal
-        os.remove(image_path)
-
         # Renderizar resultados
         return render(request, 'core/predict_results.html', {
             'class': result['class'],
             'probabilities': result['probabilities'][0],
+            'uploaded_image_url': prediction.image.url,  # Pasar la URL de la imagen
         })
 
     return render(request, 'core/predict.html')
- 
+
 
 
 def download_prediction_result(request):
