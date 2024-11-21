@@ -16,6 +16,8 @@ RUN apt-get update && apt-get install -y \
 # Copia el archivo de requisitos e instala las dependencias de Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install tensorflow
+
 
 # Copia el código del proyecto
 COPY . .
@@ -28,3 +30,4 @@ ENV PYTHONUNBUFFERED=1
 
 # Comando para ejecutar el servidor de Django
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+

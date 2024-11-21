@@ -7,14 +7,16 @@ import os
 
 
 def patient_data_form_guided(request):
-    
-    raise Exception("Vista patient_data_form_guided ejecutada")
+    """
+    Vista para manejar el formulario de evaluación de riesgo por pasos.
+    Guarda cada paso en el backend y procesa los datos al finalizar.
+    """
 
     # Paso actual, leído desde los parámetros de la URL
     current_step = int(request.GET.get('step', 1))  # Paso actual, por defecto es 1
     total_steps = 7  # Número total de pasos en el formulario
 
-    # Inicializar datos guardados (en backend)
+    # Inicializar datos guardados en la sesión (backend)
     if not request.session.get('patient_data'):
         request.session['patient_data'] = {}
         print("Inicializando datos de sesión para patient_data")
@@ -83,13 +85,14 @@ def patient_data_form_guided(request):
             'total_steps': total_steps,
         })
 
-    # Este punto no debería alcanzarse, pero lo manejamos por si acaso.
+    # Este punto no debería alcanzarse
     print("La vista no generó una respuesta válida. Devolviendo un formulario vacío.")
     return render(request, 'core/patient_data_form_guided.html', {
         'form': PatientDataForm(),
         'current_step': current_step,
         'total_steps': total_steps,
     })
+
 
 
 
@@ -121,11 +124,11 @@ def generate_pdf_data(patient_data, prediction_result, prediction_proba):
         "GENDER": "Masculino" if patient_data.GENDER == 1 else "Femenino",
         "positive_factors": positive_factors,
         "prediction_result": (
-            "Es probable que usted tenga cáncer de pulmón. Le recomendamos que consulte a un médico."
+            "Usted tiene una alta probabilidad de presentar cáncer de pulmón. Le recomendamos que consulte a un médico."
             if prediction_result == 1
             else "Es poco probable que usted tenga cáncer de pulmón. Sin embargo, le recomendamos que consulte a un médico si tiene alguna preocupación."
         ),
-        "prediction_proba": f"{prediction_proba * 100:.2f}%",  # Formatear a porcentaje con 2 decimales
+        "prediction_proba": prediction_proba * 100,  # Formatear a porcentaje con 2 decimales
     }
 
     return pdf_data
@@ -215,9 +218,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from reportlab.lib.utils import ImageReader
 
-
-#control z
 def download_prediction_result(request):
     # Recuperar datos de la sesión
     age = request.session.get("AGE", "N/A")
@@ -265,9 +267,18 @@ def download_prediction_result(request):
     probability_paragraph.drawOn(pdf, 100, y - 50)
 
     # Ajustar posición del gráfico
-    y_graph = y - 150
+    y_graph = y - 350
+
     try:
+        # Convertir `prediction_proba` a float y validar
         proba_value = float(prediction_proba)
+        if not (0 <= proba_value <= 100):
+            raise ValueError(f"El valor de prediction_proba no está en el rango esperado: {proba_value}")
+
+        # Crear el gráfico
+        from matplotlib.figure import Figure
+        from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
         fig = Figure(figsize=(4, 4))
         ax = fig.add_subplot(111)
         ax.pie(
@@ -277,21 +288,59 @@ def download_prediction_result(request):
             autopct='%1.1f%%',
         )
         ax.set_title("Probabilidad de Padecer Cáncer")
+
+        # Convertir el gráfico a imagen
         canvas_graph = FigureCanvas(fig)
         img_buffer = io.BytesIO()
         canvas_graph.print_png(img_buffer)
         img_buffer.seek(0)
 
+        # Añadir el gráfico como imagen al PDF
         pdf.drawImage(ImageReader(img_buffer), 100, y_graph, width=200, height=200)
+
+    except ValueError as ve:
+        print(f"Error de conversión o rango inválido: {ve}")
+        pdf.drawString(100, y_graph, "Gráfico no disponible: Datos inválidos.")
     except Exception as e:
-        print(f"Error al generar el gráfico: {e}")
+        print(f"Error inesperado al generar el gráfico: {e}")
         pdf.drawString(100, y_graph, "Gráfico no disponible por datos insuficientes.")
 
-    # Finalizar y guardar
+    # Finalizar y guardar el PDF
     pdf.showPage()
     pdf.save()
+
+    # Configurar la respuesta
     buffer.seek(0)
     response.write(buffer.getvalue())
     buffer.close()
 
     return response
+
+
+
+from django.shortcuts import render
+from django.http import JsonResponse
+from .predict_model import predict_tumor_category
+
+def predict_view(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        # Obtener la imagen cargada
+        image = request.FILES['image']
+        image_path = f"/tmp/{image.name}"
+
+        # Guardar temporalmente la imagen
+        with open(image_path, 'wb+') as f:
+            for chunk in image.chunks():
+                f.write(chunk)
+
+        # Realizar predicción
+        result = predict_tumor_category(image_path)
+
+        # Eliminar archivo temporal
+        os.remove(image_path)
+
+        # Retornar resultado como JSON
+        return JsonResponse(result)
+
+    return render(request, 'core/predict.html')
+
