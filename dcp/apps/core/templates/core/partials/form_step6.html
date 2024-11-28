@@ -1,45 +1,55 @@
-<div class="tab-pane fade" id="step6" method="post">
-    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
+{% load static %}
+<div class="tab-pane fade" id="step6">
+    <!-- Título -->
+    <div class="row align-items-start justify-content-center" style="margin-top: -10px;">
         <h4 class="text-center text-primary">Síntomas Respiratorios</h4>
-        <form id="form-step6">
-            {% csrf_token %}
-            <!--Preguntas-->
-            <div class="row mb-3 align-items-start justify-content-center">
-                <div class="col-md-5">
-                    <label class="form-label">{{ form.CHRONIC_DISEASE.label }}</label>
-                    {{ form.CHRONIC_DISEASE }}
-                    <br>
-                    <p class="text-muted text-center" style="font-size: small;">Sin importar la cantidad, responda si actualmente consume cigarrillos</p>
-                </div>
-                <div class="col-md-5">
-                    <div class="form-label">{{ form.ALLERGY.label }}</div>
-                    <div class="form-check">
-                        {{ form.ALLERGY }}
-                    </div>
-                    <br>
-                    <div>
-                        <p class="text-muted text-center" style="font-size: small;">Mire los dedos con los que suele tomar el cigarrillo</p>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="form-label">{{ form.COUGHING.label }}</div>
-                    <div class="form-check">
-                        {{ form.COUGHING }}
-                    </div>
-                    <br>
-                    <div>
-                        <p class="text-muted text-center" style="font-size: small;">Mire los dedos con los que suele tomar el cigarrillo</p>
-                    </div>
-                </div>
+    </div>
+
+    {% csrf_token %}
+
+    <!-- Preguntas -->
+    <div class="row align-items-start justify-content-center" style="margin-top: -50px; margin-left: 5px; margin-right: 5px;">
+        <!-- Pregunta 1 -->
+        <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
+            <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.ALLERGY.label }}</label>
+            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
+                <input type="checkbox" class="form-check-input" id="id_ALLERGY" name="ALLERGY" style="transform: scale(1.5);">
+                <label class="form-check-label" for="id_ALLERGY">Sí</label>
             </div>
-            
-            <!-- Botones -->
-            <div class="d-flex justify-content-between mt-4">
-                <button type="button" class="btn btn-secondary" onclick="prevTab('step5')">Atrás</button>
-                <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i> Home</a>
-                <button type="button" class="btn btn-primary" onclick="nextTab('step7')">Siguiente</button>
+            <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
+                <img src="{% static 'images/alergia-respiratoria.jpg' %}" alt="Consumo de cigarrillos" class="mb-3" style="height: 50px;">
+                Las alergias respiratorias son una reacción inmunitaria que se produce cuando se inhala una sustancia que el cuerpo no tolera, como el polvo, el polen, el moho, o el pelo de los animales. Los síntomas pueden manifestarse en las vías respiratorias altas o bajas, con signos como estornudos, picazón en la nariz, congestión nasal, tos, sibilancias, dificultad para respirar, entre otros.
+            </p>
+        </div>
+
+
+        <div class="col-1"></div>
+
+        <!-- Pregunta 2 -->
+        <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
+            <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.COUGHING.label }}</label>
+            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
+                <input type="checkbox" class="form-check-input" id="COUGHING" name="COUGHING" style="transform: scale(1.5);">
+                <label class="form-check-label" for="COUGHING">Sí</label>
             </div>
-        </form>
+            <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
+                <img src="{% static 'images/tos.png' %}" alt="Consumo de cigarrillos" class="mb-3" style="height: 50px;">
+                ¿Tiene tos? La tos es un reflejo natural del cuerpo que ayuda a limpiar las vías respiratorias, puede ser seca o con flemas.
+            </p>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="d-flex align-items-start justify-content-center mt-4">
+        <div class="col-4">
+            <button type="button" class="btn btn-secondary" onclick="prevTab('step5')" style="width: 150px;">Atrás</button>
+        </div>
+        <div class="col-4">
+            <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+        </div>
+        <div class="col-4">
+            <button type="button" class="btn btn-primary" onclick="nextTab('step7')" style="width: 150px;">Siguiente</button>
+        </div>
     </div>
 </div>
 

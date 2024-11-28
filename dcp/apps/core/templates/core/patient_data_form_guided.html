@@ -4,33 +4,130 @@
 {% block title %}LungSafe - Evaluación de Riesgo{% endblock %}
 
 {% block content %}
-<div class="container mt-0" style="margin-top: -40px !important;">
-    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
-        <h2 class="text-center text-primary">LungSafe: Evaluación de Riesgo</h2>
-        <p class="text-center text-muted">Completa este formulario para proceder al análisis.</p>
+<div class="container mt-0" style="margin-top: -40px !important; max-width: 800px;">
+    <!-- Contenedor Superior -->
+    <div class="shadow-sm p-4 mb-4 text-center" style="background-color: #f9f9f9; border-radius: 15px; border: 2px solid #007BFF;">
+        <h2 class="text-primary">LungSafe: Evaluación de Riesgo</h2>
+        <p class="text-muted">Completa este formulario para proceder al análisis.</p>
 
-        <!-- Pestañas de navegación -->
-        <ul class="nav nav-pills justify-content-center" id="evaluationForm">
-            {% for step in "1234567" %}
+        <!-- Navegación por números -->
+        <ul class="nav nav-pills justify-content-center">
+            {% for step in "123456789" %}
             <li class="nav-item">
-                <a class="nav-link {% if forloop.first %}active{% endif %}" data-bs-toggle="pill" href="#step{{ step }}">{{ step }}</a>
+                <button class="nav-link {% if forloop.first %}active{% endif %}" onclick="goToTab('step{{ step }}')">{{ step }}</button>
             </li>
             {% endfor %}
         </ul>
     </div>
-    
-    <div class="tab-content mt-2">
-        {% include 'core/partials/form_step1.html' %}
-        {% include 'core/partials/form_step2.html' %}
-        {% include 'core/partials/form_step3.html' %}
-        {% include 'core/partials/form_step4.html' %}
-        {% include 'core/partials/form_step5.html' %}
-        {% include 'core/partials/form_step6.html' %}
-        {% include 'core/partials/form_step7.html' %}
+
+    <!-- Formulario principal -->
+    <div class="form-card shadow p-4 mx-auto" style="max-width: 800px;">
+        <form id="multi-step-form" method="post" action="{% url 'core:patient_data_form_guided' %}">
+            {% csrf_token %}
+            <div class="tab-content px-4">
+                {% include 'core/partials/form_step1.html' %}
+                {% include 'core/partials/form_step2.html' %}
+                {% include 'core/partials/form_step3.html' %}
+                {% include 'core/partials/form_step4.html' %}
+                {% include 'core/partials/form_step5.html' %}
+                {% include 'core/partials/form_step6.html' %}
+                {% include 'core/partials/form_step7.html' %}
+                {% include 'core/partials/form_step8.html' %}
+                {% include 'core/partials/form_step9.html' %}
+                <!-- Más steps según sea necesario -->
+            </div>
+        </form>
     </div>
+</div>
+
+<!-- Scripts -->
+<script>
+    // Validar campos requeridos y avanzar al siguiente tab si están completos
+    function validateAndNextTab(tabId) {
+        const currentTab = document.querySelector('.tab-pane.active');
+        const requiredFields = currentTab.querySelectorAll('.required-field');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            // Limpiar errores previos
+            field.classList.remove('is-invalid');
+
+            // Validar si el campo está vacío
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid'); // Añadir estilo de error
+                isValid = false;
+            }
+
+            // Validación adicional para el campo "AGE"
+            if (field.name === "AGE") {
+                const ageValue = parseInt(field.value, 10); // Convertir el valor a número
+                if (isNaN(ageValue) || ageValue < 21 || ageValue > 87) {
+                    field.classList.add('is-invalid'); // Añadir estilo de error
+                    alert('La edad debe estar entre 21 y 87.'); // Mostrar mensaje de error
+                    isValid = false;
+                }
+            }
+        });
+
+        // Si todos los campos son válidos, avanzar al siguiente tab
+        if (isValid) {
+            nextTab(tabId);
+        }
+    }
+
+    // Función para avanzar al siguiente tab
+    function nextTab(tabId) {
+        const currentTab = document.querySelector('.tab-pane.active');
+        const nextTab = document.getElementById(tabId);
+
+        if (currentTab && nextTab) {
+            currentTab.classList.remove('show', 'active');
+            nextTab.classList.add('show', 'active');
+        }
+
+        // Actualizar el número destacado
+        updateActiveStep(tabId);
+    }
+
+    // Función para cambiar al tab anterior
+    function prevTab(tabId) {
+        const currentTab = document.querySelector('.tab-pane.active');
+        const prevTab = document.getElementById(tabId);
+
+        if (currentTab && prevTab) {
+            currentTab.classList.remove('show', 'active');
+            prevTab.classList.add('show', 'active');
+        }
+
+        // Actualizar el número destacado
+        updateActiveStep(tabId);
+    }
+
+    // Función para ir a un tab específico
+    function goToTab(tabId) {
+        const currentTab = document.querySelector('.tab-pane.active');
+        const targetTab = document.getElementById(tabId);
+
+        if (currentTab && targetTab) {
+            currentTab.classList.remove('show', 'active');
+            targetTab.classList.add('show', 'active');
+        }
+
+        // Actualizar el número destacado
+        updateActiveStep(tabId);
+    }
+
+    // Función para actualizar el número destacado
+    function updateActiveStep(tabId) {
+        const allLinks = document.querySelectorAll('.nav-link');
+        allLinks.forEach(link => link.classList.remove('active'));
+
+        const stepNumber = tabId.replace('step', '');
+        const targetLink = Array.from(allLinks).find(link => link.textContent === stepNumber);
+        if (targetLink) targetLink.classList.add('active');
+    }
+</script>
 
 
-<!-- Scripts y estilos -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{% static 'js/form.js' %}"></script>
+
 {% endblock %}

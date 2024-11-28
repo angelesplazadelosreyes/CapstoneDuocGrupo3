@@ -135,6 +135,8 @@ def patient_data_form_fast(request):
 
             prediction_result = model.predict(data)[0]
             prediction_proba = model.predict_proba(data)[0][1]
+            if prediction_proba == 1:
+                prediction_proba = 0.9997
 
             pdf_data = generate_pdf_data(patient_data, prediction_result, prediction_proba)
             request.session.update(pdf_data)

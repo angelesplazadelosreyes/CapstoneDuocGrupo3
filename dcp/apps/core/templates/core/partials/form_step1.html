@@ -1,33 +1,49 @@
+{% load static %}
 <div class="tab-pane fade show active" id="step1">
-    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
-        <h4 class="text-center text-primary">Edad y Sexo</h4>
-        <form id="form-step1" method="post">
-            {% csrf_token %}
-            <!--Preguntas-->
-            <div class="row mb-3 align-items-start justify-content-center">
-                <div class="col-md-5">
-                    <label class="form-label">{{ form.AGE.label }}</label>
-                    {{ form.AGE }}
-                    <br>
-                    <p class="text-muted text-center" style="font-size: small;">Ingrese un número entre 21 y 87, si su edad está fuera de este rango, por favor ingrese el número más cercano</p>
-                </div>
-                <div class="col-md-5">
-                    <div class="form-label">{{ form.GENDER.label }}</div>
-                    <div class="form-check">
-                        {{ form.GENDER }}
-                    </div>
-                    <br>
-                    <div>
-                        <p class="text-muted text-center" style="font-size: small;">Seleccione su género</p>
-                    </div>
-                    
-                </div>
+    <div class="row align-items-start justify-content-center" style="margin-top: -10px;">
+        <h4 class="text-center text-primary ">Edad y Sexo</h4>
+    </div>
+    
+    {% csrf_token %}
+
+    <!--Preguntas-->
+    <div class="row align-items-start justify-content-center" style="margin-top: -50px; margin-left: 5px; margin-right: 5px;">
+        <!--Pregunta 1-->
+        <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
+            <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.AGE.label }}</label>
+            <div class="row align-items-start justify-content-center" style="margin: 5px;">
+                {{ form.AGE }}
             </div>
-            <!-- Botones -->
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{% url 'home' %}" class="btn btn-primary"><i class="bi bi-house"></i> Home</a>
-                <button type="button" class="btn btn-primary" onclick="nextTab('step2')">Siguiente</button>
+            <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4;margin-top: -40px;">
+                <img src="{% static 'images/age.png' %}" alt="Edad" class="mb-3" style="height: 50px;">
+                Ingrese un número entre 21 y 87, si su edad está fuera de este rango, por favor ingrese el número más cercano
+            </p>
+        </div>
+        <div class="col-1"></div>
+        
+        <!--Pregunta 2-->
+        <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
+            <label class="form-label" style="margin-top: 10px; text-align: center;">{{ form.GENDER.label }}</label>
+            <div class="row align-items-start justify-content-center" style="margin: 5px;">
+                {{ form.GENDER }}
             </div>
-        </form>
+            <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4;margin-top: -30px;">
+                <img src="{% static 'images/gender.png' %}" alt="Edad" class="mb-3" style="height: 50px;">
+                Seleccione su sexo biológico, sin importar el género con el cual se identifica
+            </p>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="d-flex align-items-start justify-content-center mt-4">
+        <div class="d-flex align-items-start justify-content-center mt-4">
+            <div class="col-4">
+                <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-4">
+                <button type="button" class="btn btn-primary" onclick="validateAndNextTab('step2')" style="width: 150px;">Siguiente</button>
+            </div>
+        </div>
     </div>
 </div>
