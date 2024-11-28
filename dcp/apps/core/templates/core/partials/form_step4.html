@@ -1,0 +1,55 @@
+{% load static %}
+<div class="tab-pane fade" id="step4">
+    <!-- Título -->
+    <div class="row align-items-start justify-content-center" style="margin-top: -10px;">
+        <h4 class="text-center text-primary">Síntomas Generales</h4>
+    </div>
+
+    {% csrf_token %}
+
+    <!-- Preguntas -->
+    <div class="row align-items-start justify-content-center" style="margin-top: -50px; margin-left: 5px; margin-right: 5px;">
+        <!-- Pregunta 1 -->
+        <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
+            <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.ANXIETY.label }}</label>
+            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
+                <input type="checkbox" class="form-check-input" id="id_ANXIETY" name="ANXIETY" style="transform: scale(1.5);">
+                <label class="form-check-label" for="id_ANXIETY">Sí</label>
+            </div>
+            <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
+                <img src="{% static 'images/fatigue.jpg' %}" alt="Consumo de cigarrillos" class="mb-3" style="height: 50px;">
+                La ansiedad es un sentimiento de miedo, temor e inquietud. Puede hacer que sude, se sienta inquieto y tenso, y tener palpitaciones.
+            </p>
+        </div>
+
+
+        <div class="col-1"></div>
+
+        <!-- Pregunta 2 -->
+        <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
+            <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.SWALLOWING_DIFFICULTY.label }}</label>
+            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
+                <input type="checkbox" class="form-check-input" id="SWALLOWING_DIFFICULTY" name="SWALLOWING_DIFFICULTY" style="transform: scale(1.5);">
+                <label class="form-check-label" for="SWALLOWING_DIFFICULTY">Sí</label>
+            </div>
+            <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
+                <img src="{% static 'images/disfagia.jpg' %}" alt="Consumo de cigarrillos" class="mb-3" style="height: 50px;">
+                La disfagia, también conocida como trastorno de la deglución o dificultad para tragar, es una afección que dificulta la ingesta de alimentos, líquidos o saliva.
+            </p>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="d-flex align-items-start justify-content-center mt-4">
+        <div class="col-4">
+            <button type="button" class="btn btn-secondary" onclick="prevTab('step3')" style="width: 150px;">Atrás</button>
+        </div>
+        <div class="col-4">
+            <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+        </div>
+        <div class="col-4">
+            <button type="button" class="btn btn-primary" onclick="nextTab('step5')" style="width: 150px;">Siguiente</button>
+        </div>
+    </div>
+</div>
+

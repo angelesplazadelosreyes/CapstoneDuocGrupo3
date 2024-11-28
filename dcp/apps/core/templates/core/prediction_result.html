@@ -3,11 +3,111 @@
 {% block title %}Resultados de la Predicción{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Resultados de la Predicción</h2>
-    <p><strong>Resultado de la predicción:</strong> {% if prediction_result == 1 %}Positivo{% else %}Negativo{% endif %}</p>
-    <p><strong>Probabilidad de cáncer de pulmón:</strong> {{ prediction_proba|floatformat:2 }}%</p>
-    <a href="{% url 'core:patient_data_form' %}" class="btn btn-primary">Volver</a>
+<div class="container d-flex justify-content-center align-items-center" style="padding-top: 10px;">
+    <div class="form-card" style="padding: 20px; width: 100%; max-width: 900px;">
+        <div class="row">
+            <!-- Columna izquierda (Texto) -->
+            <div class="col-md-8" style="padding-right: 50px !important;"> <!-- Agregamos padding-right -->
+                <h2 style="margin-bottom: 10px; font-size: 1.5rem;">Resultados de la Predicción</h2>
+                <p style="margin-bottom: 10px; font-size: 1rem;">
+                    <strong>Resultado de la predicción:</strong> 
+                    {% if prediction_result == 1 %}
+                    Según sus antecedentes, es probable que usted tenga cáncer de pulmón. Le recomendamos que consulte a un médico.
+                    {% else %}
+                    Según sus antecedentes, es poco probable que usted tenga cáncer de pulmón. Sin embargo, le recomendamos que consulte a un médico si tiene alguna preocupación.
+                    {% endif %}
+                </p>
+                <p style="margin-bottom: 15px; font-size: 1rem;">
+                    <strong>Probabilidad de padecer cáncer de pulmón:</strong>
+                    {{ prediction_proba|floatformat:2 }}%
+                </p>
+
+                <div>
+                    <h4>Factores de Riesgo Positivos</h4>
+                    {% if positive_factors %}
+                        <ul>
+                            {% for factor in positive_factors %}
+                                <li>{{ factor }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No se detectaron factores de riesgo positivos.</p>
+                    {% endif %}
+                </div>
+                
+
+                <!-- Botones -->
+                <div style="margin-top: 100px;"> <!-- Espacio adicional sobre los botones -->
+                    <a href="{% url 'core:patient_data_form_fast' %}" class="btn btn-primary" style="margin-bottom: 10px;">Volver</a>
+                    <a href="{% url 'core:download_result' %}" class="btn btn-primary" style="margin-bottom: 10px; margin-left: 20px;">Descargar resultado</a>
+                </div>
+            </div>
+
+            <!-- Columna derecha (Gráfico) -->
+            <div class="col-md-4 d-flex justify-content-center align-items-center" style="padding-right: 30px !important;">
+                <canvas id="predictionChart"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Variables pasadas desde Django
+    const predictionProba = parseFloat("{{ prediction_proba|floatformat:2 }}");
+
+    // Registrar el plugin para mostrar el porcentaje
+    Chart.register({
+        id: 'percentageLabel',
+        beforeDraw(chart) {
+            const { width } = chart;
+            const { height } = chart;
+            const ctx = chart.ctx;
+            const percentage = chart.data.datasets[0].data[0]; // Valor del primer dato
+
+            ctx.restore();
+            ctx.font = 'bold 16px Arial'; // Fuente del texto
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+
+            // Posición del texto en el centro del gráfico
+            ctx.fillText(`${percentage}%`, width / 2, height / 2);
+            ctx.save();
+        }
+    });
+
+    // Configuración del gráfico
+    const ctx = document.getElementById('predictionChart').getContext('2d');
+    const predictionChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Probabilidad', 'Resto'],
+            datasets: [{
+                data: [predictionProba, 100 - predictionProba],
+                backgroundColor: ['#007BFF', '#D8D8D8'], // Colores para el gráfico
+                borderWidth: 1,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false, // Ocultar la leyenda
+                },
+                title: {
+                    display: true,
+                    text: 'Probabilidad de Padecer Cáncer', // Título del gráfico
+                    font: {
+                        size: 16, // Tamaño del texto
+                        weight: 'bold', // Negrita
+                    },
+                },
+            },
+        },
+    });
+</script>
+
 {% endblock %}
 

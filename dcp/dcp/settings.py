@@ -69,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.users.context_processors.login_form',
             ],
         },
     },
@@ -114,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 
@@ -142,4 +143,10 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 LOGIN_URL = '/'  
 LOGIN_REDIRECT_URL = '/users/dashboard/'
 
+#Control z
+SESSION_COOKIE_AGE = 30  # Tiempo en segundos (5 minutos)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expira la sesión al cerrar el navegador
+SESSION_SAVE_EVERY_REQUEST = True # Renueva la sesión en cada solicitud
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

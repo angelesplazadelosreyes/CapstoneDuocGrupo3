@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Formulario Rápido{% endblock %}
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="padding-top: 20px;">
+    <div class="form-card">
+        <h2 class="text-center text-primary mb-4">Formulario rápido</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Primera fila: GENDER y AGE -->
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.GENDER.label }}</label>
+                    <div class="form-check">
+                        {{ form.GENDER }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.AGE.label }}</label>
+                    {{ form.AGE }}
+                </div>
+            </div>
+
+            <!-- Campos restantes: Dos por fila definidos manualmente -->
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.SMOKING.label }}</label>
+                    <div class="form-check">
+                        {{ form.SMOKING }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.YELLOW_FINGERS.label }}</label>
+                    <div class="form-check">
+                        {{ form.YELLOW_FINGERS }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.ANXIETY.label }}</label>
+                    <div class="form-check">
+                        {{ form.ANXIETY }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.PEER_PRESSURE.label }}</label>
+                    <div class="form-check">
+                        {{ form.PEER_PRESSURE }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.CHRONIC_DISEASE.label }}</label>
+                    <div class="form-check">
+                        {{ form.CHRONIC_DISEASE }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.FATIGUE.label }}</label>
+                    <div class="form-check">
+                        {{ form.FATIGUE }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.ALLERGY.label }}</label>
+                    <div class="form-check">
+                        {{ form.ALLERGY }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.WHEEZING.label }}</label>
+                    <div class="form-check">
+                        {{ form.WHEEZING }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.ALCOHOL_CONSUMING.label }}</label>
+                    <div class="form-check">
+                        {{ form.ALCOHOL_CONSUMING }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.COUGHING.label }}</label>
+                    <div class="form-check">
+                        {{ form.COUGHING }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.SHORTNESS_OF_BREATH.label }}</label>
+                    <div class="form-check">
+                        {{ form.SHORTNESS_OF_BREATH }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.SWALLOWING_DIFFICULTY.label }}</label>
+                    <div class="form-check">
+                        {{ form.SWALLOWING_DIFFICULTY }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-divider">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.CHEST_PAIN.label }}</label>
+                    <div class="form-check">
+                        {{ form.CHEST_PAIN }}
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Botón de envío -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg">Enviar</button>
+            </div>
+
+            <!--Control z-->
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+        </form>
+    </div>
+</div>
+{% endblock %}

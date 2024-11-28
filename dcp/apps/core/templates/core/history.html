@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Predicciones{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Historial de Predicciones</h1>
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Imagen</th>
+                    <th>Categoría</th>
+                    <th>Probabilidades</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prediction in predictions %}
+                <tr>
+                    <td><img src="{{ prediction.image.url }}" alt="Predicción" style="max-height: 100px;"></td>
+                    <td>{{ prediction.predicted_class }}</td>
+                    <td>{{ prediction.probabilities }}</td>
+                    <td>{{ prediction.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

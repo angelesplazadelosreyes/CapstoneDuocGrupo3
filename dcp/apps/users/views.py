@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .forms import UserRegisterForm, UserLoginForm
+from .forms import UserRegisterForm, CustomAuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
@@ -11,11 +11,13 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import AuthenticationForm
+from django.urls import reverse
 import re
 
 def home(request):
-    login_form = UserLoginForm()
-    return render(request, 'home.html', {'form': login_form})
+    return render(request, 'home.html')
+
+
 
 def register(request):
     if request.method == 'POST':
@@ -31,23 +33,25 @@ def register(request):
 
 
 def login_view(request):
-    form = AuthenticationForm(request, data=request.POST or None)
-    if request.method == 'POST':
+    form = CustomAuthenticationForm(request, data=request.POST or None)
+
+    # Verifica si la solicitud es AJAX
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest' and request.method == 'POST':
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home')  # Redirige al home después de un inicio exitoso
-        messages.error(request, 'Nombre de usuario o contraseña incorrectos')
-        return render(request, 'home.html', {'form': form})
+                return JsonResponse({'success': True, 'redirect_url': reverse('dashboard')})  # Redirige al dashboard si es exitoso
+        # Si no es válido o las credenciales son incorrectas
+        return JsonResponse({'success': False, 'error': 'Nombre de usuario o contraseña incorrectos'})
 
+    # Renderiza el formulario normalmente si no es una solicitud AJAX
     return render(request, 'home.html', {'form': form})
 
 
-
-
+@login_required
 def dashboard(request):
     if not request.user.is_authenticated:
         return redirect('home')  

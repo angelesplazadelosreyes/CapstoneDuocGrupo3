@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados de la Predicción{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center">Resultados de la Predicción</h1>
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title text-center">Imagen Cargada</h5>
+                <div class="text-center">
+                    <img src="{{ uploaded_image_url }}" alt="Uploaded Image" class="img-fluid" style="max-height: 300px;">
+
+                </div>
+                <h5 class="mt-4">Categoría Predicha: <span class="text-primary">{{ class }}</span></h5>
+                <h6>Probabilidades:</h6>
+                <ul>
+                    <li>Benign: {{ probabilities.0|floatformat:2 }}</li>
+                    <li>Malignant: {{ probabilities.1|floatformat:2 }}</li>
+                    <li>Normal: {{ probabilities.2|floatformat:2 }}</li>
+                </ul>
+                <div class="mt-3 d-flex justify-content-around">
+                    <!-- Botón para hacer otra predicción -->
+                    <a href="{% url 'core:predict' %}" class="btn btn-primary">Hacer otra predicción</a>
+
+                    <!-- Botón para ver historial -->
+                    <a href="{% url 'core:history' %}" class="btn btn-secondary">Ver historial</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

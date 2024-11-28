@@ -1,0 +1,72 @@
+{% load static %}
+<div class="tab-pane fade" id="step9">
+    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
+        <h4 class="text-center text-primary">Síntomas Respiratorios</h4>
+        
+        <!-- Preguntas -->
+        <div class="row mb-3 align-items-start justify-content-center">
+            <div class="col-md-5">
+                <label class="form-label">{{ form.SHORTNESS_OF_BREATH.label }}</label>
+                {{ form.SHORTNESS_OF_BREATH }}
+                <br><br><br>
+                <p class="text-muted text-center" style="font-size: small;">¿Siente que le falta el aire?</p>
+            </div>
+            <div class="col-md-5">
+                <div class="form-label">{{ form.WHEEZING.label }}</div>
+                <div class="form-check">
+                    {{ form.WHEEZING }}
+                </div>
+                <br><br><br>
+                <div>
+                    <p class="text-muted text-center" style="font-size: small;">Las sibilancias son ruidos respiratorio similares a silbidos.</p>
+                    
+                    <!-- Etiqueta audio oculta -->
+                    <audio id="audioPlayer">
+                        <source src="{% static 'audios/Sibilancia.mp3' %}" type="audio/mpeg">
+                        Tu navegador no soporta la reproducción de audio. Escúchalo en: 
+                        <a href="https://www.youtube.com/watch?v=j6e2AtLep_w">Sibilancia</a>
+                    </audio>
+
+                    <!-- Botón para reproducir -->
+                    <button type="button" class="btn btn-primary" onclick="playAudio()">Reproducir Audio</button>
+                    
+                    <script>
+                        // Función para reproducir el audio
+                        function playAudio() {
+                            const audio = document.getElementById('audioPlayer');
+                            if (audio) {
+                                audio.play().catch(error => {
+                                    console.error("Error al reproducir el audio:", error);
+                                });
+                            } else {
+                                console.error("No se encontró el reproductor de audio.");
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-secondary" onclick="prevTab('step6')">Atrás</button>
+            <button type="submit" class="btn btn-success btn-lg">Enviar</button>
+        </div>
+
+        <!-- Mostrar errores -->
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>

@@ -3,6 +3,62 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h2>Bienvenido, {{ user.username }}</h2>
-    <p>Esta es la página para usuarios registrados con funcionalidades adicionales.</p>
+    
+    {% load static %}
+
+    <!-- Contenedor del cuadro de bienvenida -->
+    <div class="container d-flex justify-content-center align-items-center" style="padding-top: calc(5px + 20px);">
+
+        <!-- Cuadro de bienvenida -->
+        <div class="welcome-box shadow-lg">
+            <div class="d-flex align-items-center justify-content-center text-center">
+                <img src="{% static 'images/logo-dcp.png' %}" alt="logo-dcp" class="me-3" style="height: 100px;">
+                <h1 class="text-primary">Bienvenido, {{ user.username }}</h1>
+            </div>
+            <p class="text-muted text-center">Tu identificador de Cáncer Pulmonar</p>
+            <p class="text-center">Diagnóstico temprano para mejorar tu calidad de vida. Haciendo este rápido análisis puedes saber la probabilidad de padecer esta enfermedad.</p>
+        </div>
+        
+    </div>
+
+
+    <!--Contenedor para opciones de formulario-->
+    <div class="container d-flex justify-content-center align-items-center mt-3">
+        <div class="row justify-content-center">
+            <!-- Tarjeta 1 -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card shadow text-center">
+                    <div class="card-body">
+                        <img src="{% static 'images/formulario-ico.png' %}" alt="Icono 1" class="mb-3" style="height: 50px;">
+                        <h5 class="card-title text-primary">Formulario guiado</h5>
+                        <p class="card-text">Formulario para el ingreso de datos con ejemplos.</p>
+                        <a href="{% url 'core:patient_data_form_guided' %}" class="btn btn-primary">IR</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Tarjeta 2 -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card shadow text-center">
+                    <div class="card-body">
+                        <img src="{% static 'images/formulario-ico-fast.png' %}" alt="Icono 2" class="mb-3" style="height: 50px;">
+                        <h5 class="card-title text-primary">Formulario rápido</h5>
+                        <p class="card-text">Formulario de llenado rápido para el ingreso de datos.</p>
+                        <a href="{% url 'core:patient_data_form_fast' %}" class="btn btn-primary">IR</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Tarjeta 3 -->
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card shadow text-center">
+                    <div class="card-body">
+                        <img src="{% static 'images/tomografia.png' %}" alt="Icono 3" class="mb-3" style="height: 50px;">
+                        <h5 class="card-title text-primary">Imágenes</h5>
+                        <p class="card-text">Predicción para imágenes de tomografías pulmonares.</p>
+                        <a href="{% url 'core:predict' %}" class="btn btn-primary">IR</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
