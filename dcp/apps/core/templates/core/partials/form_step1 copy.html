@@ -1,49 +1,50 @@
 {% load static %}
 <div class="tab-pane fade show active" id="step1">
     <div class="row align-items-start justify-content-center" style="margin-top: -10px;">
-        <h4 class="text-center text-primary">Edad y Sexo</h4>
+        <h4 class="text-center text-primary ">Edad y Sexo</h4>
     </div>
-
+    
     {% csrf_token %}
 
-    <!-- Preguntas -->
+    <!--Preguntas-->
     <div class="row align-items-start justify-content-center" style="margin-top: -50px; margin-left: 5px; margin-right: 5px;">
-
-        <!-- Pregunta 1 (AGE) -->
+        <!--Pregunta 1-->
         <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
             <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.AGE.label }}</label>
             <div class="row align-items-start justify-content-center" style="margin: 5px;">
-                <input type="number" id="ageField" name="AGE" class="form-control required-field" style="max-width: 100px;" placeholder="Ingrese su edad" min="21" max="87">
+                {{ form.AGE }}
             </div>
             <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4;margin-top: -40px;">
                 <img src="{% static 'images/age.png' %}" alt="Edad" class="mb-3" style="height: 50px;">
-                Ingrese un número entre 21 y 87. Si su edad está fuera de este rango, ingrese el número más cercano.
+                Ingrese un número entre 21 y 87, si su edad está fuera de este rango, por favor ingrese el número más cercano
             </p>
         </div>
         <div class="col-1"></div>
-
-        <!-- Pregunta 2 (GENDER) -->
+        
+        <!--Pregunta 2-->
         <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
             <label class="form-label" style="margin-top: 10px; text-align: center;">{{ form.GENDER.label }}</label>
             <div class="row align-items-start justify-content-center" style="margin: 5px;">
-                {{ form.GENDER }}
+                {{ form.GENDER.as_widget.attrs.update({'class': 'form-check-input required-field'}) }}
             </div>
             <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -30px;">
                 <img src="{% static 'images/gender.png' %}" alt="Género" class="mb-3" style="height: 50px;">
                 Seleccione su sexo biológico, sin importar el género con el cual se identifica.
             </p>
         </div>
-
+        
     </div>
 
     <!-- Botones -->
     <div class="d-flex align-items-start justify-content-center mt-4">
-        <div class="col-4">
-            <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
-        </div>
-        <div class="col-4"></div>
-        <div class="col-4">
-            <button type="button" id="nextBtn" class="btn btn-primary" style="width: 150px;">Siguiente</button>
+        <div class="d-flex align-items-start justify-content-center mt-4">
+            <div class="col-4">
+                <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-4">
+                <button type="button" class="btn btn-primary" onclick="validateAndNextTab('step2')" style="width: 150px;">Siguiente</button>
+            </div>
         </div>
     </div>
 </div>

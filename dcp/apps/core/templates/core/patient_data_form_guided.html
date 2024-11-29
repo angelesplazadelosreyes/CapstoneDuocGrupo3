@@ -42,68 +42,46 @@
 
 <!-- Scripts -->
 <script>
-    // Validar campos requeridos y avanzar al siguiente tab si están completos
-    function validateAndNextTab(tabId) {
-        const currentTab = document.querySelector('.tab-pane.active');
-        const requiredFields = currentTab.querySelectorAll('.required-field');
-        let isValid = true;
+    // Inicializar el array de respuestas
+    const userResponses = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    console.log("Array inicializado:", userResponses);
 
-        requiredFields.forEach(field => {
-            // Limpiar errores previos
-            field.classList.remove('is-invalid');
+    // Mostrar mensaje emergente y marcar errores
+    function validateAndHighlight(field, message) {
+        field.classList.add("is-invalid");
+        alert(message);
+        console.log("Validación fallida:", message);
+    }
 
-            // Validar si el campo está vacío
-            if (!field.value.trim()) {
-                field.classList.add('is-invalid'); // Añadir estilo de error
-                isValid = false;
-            }
+    // Validar el campo AGE
+    function validateAGE(nextTabId) {
+        const ageField = document.querySelector('[name="AGE"]');
+        const ageValue = parseInt(ageField.value, 10);
 
-            // Validación adicional para el campo "AGE"
-            if (field.name === "AGE") {
-                const ageValue = parseInt(field.value, 10); // Convertir el valor a número
-                if (isNaN(ageValue) || ageValue < 21 || ageValue > 87) {
-                    field.classList.add('is-invalid'); // Añadir estilo de error
-                    alert('La edad debe estar entre 21 y 87.'); // Mostrar mensaje de error
-                    isValid = false;
-                }
+        if (isNaN(ageValue) || ageValue < 21 || ageValue > 87) {
+            validateAndHighlight(ageField, "La edad debe ser un número entre 21 y 87.");
+            return false;
+        } else {
+            ageField.classList.remove("is-invalid");
+            userResponses[0] = ageValue;
+            console.log("Validación exitosa de AGE. Array actualizado:", userResponses);
+            goToTab(nextTabId);
+            return true;
+        }
+    }
+
+    // Manejar cambios en el campo GENDER
+    function updateGender() {
+        const genderRadios = document.querySelectorAll('[name="GENDER"]');
+        genderRadios.forEach((radio) => {
+            if (radio.checked) {
+                userResponses[1] = parseInt(radio.value);
+                console.log("Cambio en GENDER detectado. Array actualizado:", userResponses);
             }
         });
-
-        // Si todos los campos son válidos, avanzar al siguiente tab
-        if (isValid) {
-            nextTab(tabId);
-        }
     }
 
-    // Función para avanzar al siguiente tab
-    function nextTab(tabId) {
-        const currentTab = document.querySelector('.tab-pane.active');
-        const nextTab = document.getElementById(tabId);
-
-        if (currentTab && nextTab) {
-            currentTab.classList.remove('show', 'active');
-            nextTab.classList.add('show', 'active');
-        }
-
-        // Actualizar el número destacado
-        updateActiveStep(tabId);
-    }
-
-    // Función para cambiar al tab anterior
-    function prevTab(tabId) {
-        const currentTab = document.querySelector('.tab-pane.active');
-        const prevTab = document.getElementById(tabId);
-
-        if (currentTab && prevTab) {
-            currentTab.classList.remove('show', 'active');
-            prevTab.classList.add('show', 'active');
-        }
-
-        // Actualizar el número destacado
-        updateActiveStep(tabId);
-    }
-
-    // Función para ir a un tab específico
+    // Cambiar a un tab específico
     function goToTab(tabId) {
         const currentTab = document.querySelector('.tab-pane.active');
         const targetTab = document.getElementById(tabId);
@@ -111,23 +89,122 @@
         if (currentTab && targetTab) {
             currentTab.classList.remove('show', 'active');
             targetTab.classList.add('show', 'active');
+            console.log(`Cambio de tab realizado. Tab actual: ${tabId}`);
+        } else {
+            console.error("Error al cambiar de tab:", { currentTab, targetTab });
+        }
+    }
+
+    // Escuchar cambios en checkboxes
+    function initializeCheckboxListeners() {
+        const checkboxMappings = {
+            "id_SMOKING": 2,
+            "id_YELLOW_FINGERS": 3,
+            "id_PEER_PRESSURE": 5,
+            "id_ALCOHOL_CONSUMING": 10,
+            "id_ANXIETY": 4,
+            "id_SWALLOWING_DIFFICULTY": 7,
+            "id_FATIGUE": 6,
+            "id_CHEST_PAIN": 14,
+            "id_ALLERGY": 8,
+            "id_COUGHING": 9,
+            "id_CHRONIC_DISEASE": 13,
+            "id_SHORTNESS_OF_BREATH": 11,
+            "id_WHEEZING": 12
+        };
+
+        Object.keys(checkboxMappings).forEach((checkboxId) => {
+            const checkbox = document.getElementById(checkboxId);
+            if (checkbox) {
+                checkbox.addEventListener("change", () => {
+                    const index = checkboxMappings[checkboxId];
+                    userResponses[index] = checkbox.checked ? 1 : 0;
+                    console.log(`Cambio en ${checkboxId}. Array actualizado:`, userResponses);
+                });
+            } else {
+                console.warn(`Checkbox con ID ${checkboxId} no encontrado en el DOM.`);
+            }
+        });
+    }
+
+    // Función para generar el resumen
+    function generateSummary() {
+        console.log("Generando resumen...");
+        const userSummary = document.getElementById("userSummary");
+        if (userSummary) {
+            userSummary.innerHTML = "";
+            console.log("Limpiando contenido previo del resumen...");
+
+            const summary = [
+                `Edad: ${userResponses[0]}`,
+                `Sexo: ${userResponses[1] === 1 ? "Hombre" : "Mujer"}`,
+                `Fuma: ${userResponses[2] === 1 ? "Sí" : "No"}`,
+                `Dedos amarillos: ${userResponses[3] === 1 ? "Sí" : "No"}`,
+                `Ansiedad: ${userResponses[4] === 1 ? "Sí" : "No"}`,
+                `Presión de grupo: ${userResponses[5] === 1 ? "Sí" : "No"}`,
+                `Fatiga: ${userResponses[6] === 1 ? "Sí" : "No"}`,
+                `Dificultad para tragar: ${userResponses[7] === 1 ? "Sí" : "No"}`,
+                `Alergias: ${userResponses[8] === 1 ? "Sí" : "No"}`,
+                `Tos: ${userResponses[9] === 1 ? "Sí" : "No"}`,
+                `Consumo de alcohol: ${userResponses[10] === 1 ? "Sí" : "No"}`,
+                `Falta de aire: ${userResponses[11] === 1 ? "Sí" : "No"}`,
+                `Sibilancias: ${userResponses[12] === 1 ? "Sí" : "No"}`,
+                `Enfermedades crónicas: ${userResponses[13] === 1 ? "Sí" : "No"}`,
+                `Dolor en el pecho: ${userResponses[14] === 1 ? "Sí" : "No"}`
+            ];
+
+            summary.forEach((item) => {
+                const listItem = document.createElement("li");
+                listItem.textContent = item;
+                listItem.classList.add("list-group-item");
+                userSummary.appendChild(listItem);
+            });
+
+            console.log("Resumen generado exitosamente.");
+        } else {
+            console.error("Elemento 'userSummary' no encontrado.");
+        }
+    }
+
+    // Inicializar eventos al cargar el DOM
+    document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM cargado. Inicializando listeners...");
+
+        // Inicializar listeners de checkboxes
+        initializeCheckboxListeners();
+
+        // Validar AGE
+        const nextBtnStep1 = document.querySelector("#nextBtn");
+        if (nextBtnStep1) {
+            nextBtnStep1.addEventListener("click", (e) => {
+                e.preventDefault();
+                validateAGE('step2');
+            });
         }
 
-        // Actualizar el número destacado
-        updateActiveStep(tabId);
-    }
+        // Escuchar cambios en GENDER
+        const genderRadios = document.querySelectorAll('[name="GENDER"]');
+        if (genderRadios.length) {
+            genderRadios.forEach((radio) => {
+                radio.addEventListener("change", updateGender);
+            });
+        }
 
-    // Función para actualizar el número destacado
-    function updateActiveStep(tabId) {
-        const allLinks = document.querySelectorAll('.nav-link');
-        allLinks.forEach(link => link.classList.remove('active'));
+        // Unificar eventos para todos los botones hacia step9
+        const buttonsToStep9 = document.querySelectorAll('button[onclick="goToTab(\'step9\')"]');
+        buttonsToStep9.forEach((button) => {
+            button.removeAttribute("onclick"); // Remover evento inline
+            button.addEventListener("click", (e) => {
+                e.preventDefault();
+                console.log("Botón hacia 'step9' presionado. Generando resumen...");
+                generateSummary();
+                goToTab("step9");
+            });
+        });
 
-        const stepNumber = tabId.replace('step', '');
-        const targetLink = Array.from(allLinks).find(link => link.textContent === stepNumber);
-        if (targetLink) targetLink.classList.add('active');
-    }
+        console.log(`${buttonsToStep9.length} botones hacia 'step9' inicializados.`);
+    });
 </script>
-
 
 
 {% endblock %}

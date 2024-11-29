@@ -3,10 +3,18 @@
 {% block title %}Historial de Predicciones{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center">Historial de Predicciones</h1>
+<div class="container"  style="margin-top: -40px;">
+    <div class="mt-3 d-flex justify-content-around" >
+        <!-- Botón para hacer otra predicción -->
+        <a href="{% url 'core:predict' %}" class="btn btn-primary">Hacer otra predicción</a>
+    
+        <!-- Botón para volver a home -->
+        <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+    
+    </div>
+    <h1 class="text-center"><br>Historial de Predicciones</h1>
     <div class="table-responsive mt-4">
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped" style="background-color: white; border-collapse: collapse; width: 100%; border-color: #2011ee;">
             <thead>
                 <tr>
                     <th>Imagen</th>
@@ -28,4 +36,5 @@
         </table>
     </div>
 </div>
+
 {% endblock %}

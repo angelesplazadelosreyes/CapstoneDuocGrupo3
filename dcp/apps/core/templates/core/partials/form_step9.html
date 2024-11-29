@@ -1,72 +1,31 @@
 {% load static %}
 <div class="tab-pane fade" id="step9">
-    <div class="form-card shadow p-4 mx-auto" style="max-width: 600px;">
-        <h4 class="text-center text-primary">Síntomas Respiratorios</h4>
-        
-        <!-- Preguntas -->
-        <div class="row mb-3 align-items-start justify-content-center">
-            <div class="col-md-5">
-                <label class="form-label">{{ form.SHORTNESS_OF_BREATH.label }}</label>
-                {{ form.SHORTNESS_OF_BREATH }}
-                <br><br><br>
-                <p class="text-muted text-center" style="font-size: small;">¿Siente que le falta el aire?</p>
-            </div>
-            <div class="col-md-5">
-                <div class="form-label">{{ form.WHEEZING.label }}</div>
-                <div class="form-check">
-                    {{ form.WHEEZING }}
-                </div>
-                <br><br><br>
-                <div>
-                    <p class="text-muted text-center" style="font-size: small;">Las sibilancias son ruidos respiratorio similares a silbidos.</p>
-                    
-                    <!-- Etiqueta audio oculta -->
-                    <audio id="audioPlayer">
-                        <source src="{% static 'audios/Sibilancia.mp3' %}" type="audio/mpeg">
-                        Tu navegador no soporta la reproducción de audio. Escúchalo en: 
-                        <a href="https://www.youtube.com/watch?v=j6e2AtLep_w">Sibilancia</a>
-                    </audio>
+    <!-- Título -->
+    <div class="row align-items-start justify-content-center" style="margin-top: -10px;">
+        <h4 class="text-center text-primary">Resumen de Respuestas</h4>
+    </div>
 
-                    <!-- Botón para reproducir -->
-                    <button type="button" class="btn btn-primary" onclick="playAudio()">Reproducir Audio</button>
-                    
-                    <script>
-                        // Función para reproducir el audio
-                        function playAudio() {
-                            const audio = document.getElementById('audioPlayer');
-                            if (audio) {
-                                audio.play().catch(error => {
-                                    console.error("Error al reproducir el audio:", error);
-                                });
-                            } else {
-                                console.error("No se encontró el reproductor de audio.");
-                            }
-                        }
-                    </script>
-                </div>
-            </div>
+    {% csrf_token %}
+
+    <!-- Listado de Respuestas -->
+    <div class="row align-items-start justify-content-center" style="margin-top: -50px; margin-left: 5px; margin-right: 5px;">
+        <div class="col-10" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF; padding: 20px;">
+            <ul id="userSummary" class="list-group">
+                <!-- Aquí se llenará dinámicamente el listado -->
+            </ul>
         </div>
+    </div>
 
-        <!-- Botones -->
-        <div class="d-flex justify-content-between mt-4">
-            <button type="button" class="btn btn-secondary" onclick="prevTab('step6')">Atrás</button>
-            <button type="submit" class="btn btn-success btn-lg">Enviar</button>
+    <!-- Botones -->
+    <div class="d-flex align-items-start justify-content-center mt-4">
+        <div class="col-4">
+            <button type="button" class="btn btn-secondary" onclick="goToTab('step8')" style="width: 150px;">Atrás</button>
         </div>
-
-        <!-- Mostrar errores -->
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                <ul>
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+        <div class="col-4">
+            <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+        </div>
+        <div class="col-4">
+            <button type="button" class="btn btn-success" id="submitBtn" style="width: 150px;">Enviar</button>
+        </div>
     </div>
 </div>

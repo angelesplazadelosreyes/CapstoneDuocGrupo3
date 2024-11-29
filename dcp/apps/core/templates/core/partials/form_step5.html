@@ -17,11 +17,10 @@
                 <label class="form-check-label" for="id_FATIGUE">Sí</label>
             </div>
             <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
-                <img src="{% static 'images/fatigue.jpg' %}" alt="Consumo de cigarrillos" class="mb-3" style="height: 50px;">
+                <img src="{% static 'images/fatigue.jpg' %}" alt="Sensación de cansancio" class="mb-3" style="height: 50px;">
                 ¿Tiene sensación de cansancio, falta de energía o agotamiento?
             </p>
         </div>
-
 
         <div class="col-1"></div>
 
@@ -29,11 +28,11 @@
         <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
             <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.CHEST_PAIN.label }}</label>
             <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
-                <input type="checkbox" class="form-check-input" id="CHEST_PAIN" name="CHEST_PAIN" style="transform: scale(1.5);">
-                <label class="form-check-label" for="CHEST_PAIN">Sí</label>
+                <input type="checkbox" class="form-check-input" id="id_CHEST_PAIN" name="CHEST_PAIN" style="transform: scale(1.5);">
+                <label class="form-check-label" for="id_CHEST_PAIN">Sí</label>
             </div>
             <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
-                <img src="{% static 'images/chest-pain.jpg' %}" alt="Consumo de cigarrillos" class="mb-3" style="height: 50px;">
+                <img src="{% static 'images/chest-pain.jpg' %}" alt="Dolor en el pecho" class="mb-3" style="height: 50px;">
                 ¿Tiene dolor en el pecho?
             </p>
         </div>
@@ -42,13 +41,13 @@
     <!-- Botones -->
     <div class="d-flex align-items-start justify-content-center mt-4">
         <div class="col-4">
-            <button type="button" class="btn btn-secondary" onclick="prevTab('step4')" style="width: 150px;">Atrás</button>
+            <button type="button" class="btn btn-secondary" onclick="goToTab('step4')" style="width: 150px;">Atrás</button>
         </div>
         <div class="col-4">
             <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
         </div>
         <div class="col-4">
-            <button type="button" class="btn btn-primary" onclick="nextTab('step6')" style="width: 150px;">Siguiente</button>
+            <button type="button" class="btn btn-primary" onclick="goToTab('step6')" style="width: 150px;">Siguiente</button>
         </div>
     </div>
 </div>

@@ -27,14 +27,15 @@
     <!-- Botones -->
     <div class="d-flex align-items-start justify-content-center mt-4">
         <div class="col-4">
-            <button type="button" class="btn btn-secondary" onclick="prevTab('step6')" style="width: 150px;">Atrás</button>
+            <button type="button" class="btn btn-secondary" onclick="goToTab('step6')" style="width: 150px;">Atrás</button>
         </div>
         <div class="col-4">
             <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
         </div>
         <div class="col-4">
-            <button type="button" class="btn btn-primary" onclick="nextTab('step8')" style="width: 150px;">Siguiente</button>
+            <button type="button" class="btn btn-primary" onclick="goToTab('step8')" style="width: 150px;">Siguiente</button>
         </div>
     </div>
+
 </div>
 

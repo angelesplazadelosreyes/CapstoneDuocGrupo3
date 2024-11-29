@@ -137,6 +137,9 @@ def patient_data_form_fast(request):
             prediction_proba = model.predict_proba(data)[0][1]
             if prediction_proba == 1:
                 prediction_proba = 0.9997
+            elif prediction_proba == 0:
+                prediction_proba = 0.0001
+            
 
             pdf_data = generate_pdf_data(patient_data, prediction_result, prediction_proba)
             request.session.update(pdf_data)
@@ -153,9 +156,6 @@ def patient_data_form_fast(request):
 
 
 def predict_view(request):
-    """
-    Vista para manejar predicciones basadas en imágenes cargadas por el usuario.
-    """
     if request.method == 'POST' and request.FILES.get('image'):
         # Obtener la imagen cargada
         image = request.FILES['image']
@@ -164,7 +164,14 @@ def predict_view(request):
         image_bytes = io.BytesIO(image.read())
 
         # Realizar predicción
-        result = predict_tumor_category(image_bytes)  # Pasar BytesIO en lugar de InMemoryUploadedFile
+        result = predict_tumor_category(image_bytes)
+
+        # Depurar para confirmar la estructura de probabilities
+        print("Result probabilities:", result['probabilities'])
+
+        # Multiplicar y redondear las probabilidades por 100
+        probabilities = [round(float(p) * 100, 2) for p in result['probabilities'][0]]
+        print("Processed probabilities:", probabilities)
 
         # Guardar predicción automáticamente en la base de datos
         prediction = PredictionHistory.objects.create(
@@ -176,8 +183,8 @@ def predict_view(request):
         # Renderizar resultados
         return render(request, 'core/predict_results.html', {
             'class': result['class'],
-            'probabilities': result['probabilities'][0],
-            'uploaded_image_url': prediction.image.url,  # Pasar la URL de la imagen
+            'probabilities': probabilities,  # Asegúrate de pasar esto al template
+            'uploaded_image_url': prediction.image.url,
         })
 
     return render(request, 'core/predict.html')

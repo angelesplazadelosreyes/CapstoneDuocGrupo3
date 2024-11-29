@@ -11,13 +11,13 @@
     <div class="row align-items-start justify-content-center" style="margin-top: -50px; margin-left: 5px; margin-right: 5px;">
         <!-- Pregunta 1 -->
         <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
-            <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.SHORTNESS_OF_BREATH.label }}</label>
-            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
+            <label class="form-label" for="id_SHORTNESS_OF_BREATH" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.SHORTNESS_OF_BREATH.label }}</label>
+            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px;">
                 <input type="checkbox" class="form-check-input" id="id_SHORTNESS_OF_BREATH" name="SHORTNESS_OF_BREATH" style="transform: scale(1.5);">
                 <label class="form-check-label" for="id_SHORTNESS_OF_BREATH">Sí</label>
             </div>
             <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
-                <img src="{% static 'images/epoc.jpg' %}" alt="dISNEA" class="mb-3" style="height: 50px;">
+                <img src="{% static 'images/epoc.jpg' %}" alt="Disnea" class="mb-3" style="height: 50px;">
                 ¿Siente que le falta el aire?
             </p>
         </div>
@@ -26,20 +26,20 @@
 
         <!-- Pregunta 2 -->
         <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
-            <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.WHEEZING.label }}</label>
-            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
-                <input type="checkbox" class="form-check-input" id="WHEEZING" name="WHEEZING" style="transform: scale(1.5);">
-                <label class="form-check-label" for="WHEEZING">Sí</label>
+            <label class="form-label" for="id_WHEEZING" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.WHEEZING.label }}</label>
+            <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px;">
+                <input type="checkbox" class="form-check-input" id="id_WHEEZING" name="WHEEZING" style="transform: scale(1.5);">
+                <label class="form-check-label" for="id_WHEEZING">Sí</label>
             </div>
             <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
                 <img src="{% static 'images/sibilancia.jpg' %}" alt="Sibilancia" class="mb-3" style="height: 50px;">
-                Las sibilancias son ruidos respiratorio similares a silbidos.
+                Las sibilancias son ruidos respiratorios similares a silbidos.
             </p>
             <!-- Etiqueta audio oculta -->
             <audio id="audioPlayer">
                 <source src="{% static 'audios/Sibilancia.mp3' %}" type="audio/mpeg">
                 Tu navegador no soporta la reproducción de audio. Escúchalo en: 
-                <a href="https://www.youtube.com/watch?v=j6e2AtLep_w">Sibilancia</a>
+                <a href="https://www.youtube.com/watch?v=j6e2AtLep_w" target="_blank">Sibilancia</a>
             </audio>
 
             <!-- Botón para reproducir -->
@@ -59,20 +59,18 @@
                 }
             </script>
         </div>
-
     </div>
 
     <!-- Botones -->
     <div class="d-flex align-items-start justify-content-center mt-4">
         <div class="col-4">
-            <button type="button" class="btn btn-secondary" onclick="prevTab('step7')" style="width: 150px;">Atrás</button>
+            <button type="button" class="btn btn-secondary" onclick="goToTab('step7')" style="width: 150px;">Atrás</button>
         </div>
         <div class="col-4">
             <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
         </div>
         <div class="col-4">
-            <button type="button" class="btn btn-primary" onclick="nextTab('step9')" style="width: 150px;">Siguiente</button>
+            <button type="button" class="btn btn-primary" onclick="goToTab('step9')" style="width: 150px;">Siguiente</button>
         </div>
     </div>
 </div>
-

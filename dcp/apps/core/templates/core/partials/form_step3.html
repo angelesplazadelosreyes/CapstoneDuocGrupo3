@@ -29,8 +29,8 @@
         <div class="col" style="background-color: #fcfbdc; border-radius: 15px; border: 2px solid #007BFF;">
             <label class="form-label" style="margin-top: 10px; margin-bottom: 10px; text-align: center;">{{ form.ALCOHOL_CONSUMING.label }}</label>
             <div class="form-check form-switch row align-items-start justify-content-center" style="margin: 5px; margin-left: 30px; ">
-                <input type="checkbox" class="form-check-input" id="ALCOHOL_CONSUMING" name="ALCOHOL_CONSUMING" style="transform: scale(1.5);">
-                <label class="form-check-label" for="ALCOHOL_CONSUMING">Sí</label>
+                <input type="checkbox" class="form-check-input" id="id_ALCOHOL_CONSUMING" name="ALCOHOL_CONSUMING" style="transform: scale(1.5);">
+                <label class="form-check-label" for="id_ALCOHOL_CONSUMING">Sí</label>
             </div>
             <p class="text-muted text-justify p-2" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; margin-top: -40px;">
                 <img src="{% static 'images/alcohol.png' %}" alt="Consumo de cigarrillos" class="mb-3" style="height: 50px;">
@@ -42,13 +42,13 @@
     <!-- Botones -->
     <div class="d-flex align-items-start justify-content-center mt-4">
         <div class="col-4">
-            <button type="button" class="btn btn-secondary" onclick="prevTab('step2')" style="width: 150px;">Atrás</button>
+            <button type="button" class="btn btn-secondary" onclick="goToTab('step2')" style="width: 150px;">Atrás</button>
         </div>
         <div class="col-4">
             <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
         </div>
         <div class="col-4">
-            <button type="button" class="btn btn-primary" onclick="nextTab('step4')" style="width: 150px;">Siguiente</button>
+            <button type="button" class="btn btn-primary" onclick="goToTab('step4')" style="width: 150px;">Siguiente</button>
         </div>
     </div>
 </div>
