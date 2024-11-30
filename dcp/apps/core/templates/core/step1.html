@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paso 1 - Datos Personales{% endblock %}
+
+{% block content %}
+<div class="container mt-0" style="max-width: 1000px;">
+    <div class="shadow-sm p-4 mb-4 text-center" style="background-color: #f9f9f9; border-radius: 15px; border: 2px solid #007BFF;">
+        <h2 class="text-center text-primary">Paso 1: Datos Personales</h2>
+        <p class="text-center text-muted">Por favor, completa la siguiente información para continuar.</p>
+    </div>
+    
+    <div class="shadow-sm p-4 mb-4 text-center" style="background-color: #f9f9f9; border-radius: 15px; border: 2px solid #007BFF;">
+        <form method="post" action="{% url 'core:step1' %}">
+            {% csrf_token %}
+    
+            <!-- Campo AGE -->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/age.png' %}" alt="Edad" class="mb-3" style="height: 50px;">
+                </div>
+
+                <div class="col-4 d-flex justify-content-center align-items-center" >
+                    <div class="form-group">
+                        <label for="AGE">Edad</label>
+                        <input type="number" name="AGE" id="AGE" class="form-control" value="{{ AGE }}" min="21" max="87" required style="max-width: 100px;">
+                    </div>
+                </div>
+
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Ingrese un número entre 21 y 87. Si su edad está fuera de este rango, ingrese el número más cercano.
+                    </p>
+
+                </div>
+
+            </div>
+            
+    
+            <!-- Campo GENDER -->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/gender.png' %}" alt="Sexo" class="mb-3" style="height: 50px;">
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <label for="GENDER">Género</label><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="GENDER" id="GENDER_MALE" value="1" {% if GENDER == '1' %}checked{% endif %}>
+                            <label class="form-check-label" for="GENDER_MALE">Masculino</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="GENDER" id="GENDER_FEMALE" value="0" {% if GENDER == '0' %}checked{% endif %}>
+                            <label class="form-check-label" for="GENDER_FEMALE">Femenino</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Seleccione su sexo biológico, sin importar el género con el cual se identifica.
+                    </p>
+                </div>
+            </div>
+
+    
+            <!-- Campo SMOKING -->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/smoking.png' %}" alt="Fuma" class="mb-3" style="height: 50px;">
+                </div>
+                <div class="col-4">
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="SMOKING" id="SMOKING" class="form-check-input" value="1" {% if SMOKING == '1' %}checked{% endif %}>
+                        <label class="form-check-label" for="SMOKING">¿Fuma?</label>
+                    </div>
+                </div>
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque esta casilla si es fumador, sin importar el número de cigarrillos que consume. Si no fuma, déjela desmarcada.
+                    </p>
+                </div>
+            </div>           
+
+    
+            <!-- Campo YELLOW_FINGERS -->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/yellow-fingers.jpg' %}" alt="Dedos amarillos" class="mb-3" style="height: 70px;">
+                </div>
+                <div class="col-4">
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="YELLOW_FINGERS" id="YELLOW_FINGERS" class="form-check-input" value="1" {% if YELLOW_FINGERS == '1' %}checked{% endif %}>
+                        <label class="form-check-label" for="YELLOW_FINGERS">¿Dedos amarillos?</label>
+                    </div>
+                </div>
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque esta casilla si sus dedos tienen una coloración amarillenta, como se muestra en la imagen. Si no es así, déjela desmarcada.
+                    </p>
+                </div>
+            </div>
+
+    
+            <!-- Botón para continuar -->
+            <div class="d-flex align-items-start justify-content-center mt-4">
+                <div class="col-4">
+                    <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+                </div>
+                <div class="col-4"></div>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary" style="width: 150px;">Siguiente</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paso 3 - Más Factores{% endblock %}
+
+{% block content %}
+<div class="container mt-0" style="max-width: 1000px;">
+    <div class="shadow-sm p-4 mb-4 text-center" style="background-color: #f9f9f9; border-radius: 15px; border: 2px solid #007BFF;">
+        <h2 class="text-center text-primary">Paso 3: Más Factores</h2>
+    </div>
+
+    <div class="shadow-sm p-4 mb-4 text-center" style="background-color: #f9f9f9; border-radius: 15px; border: 2px solid #007BFF;">
+        <form method="post">
+            {% csrf_token %}
+
+            <!--Campo SWALLOWING_DIFFICULTY-->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/disfagia.jpg' %}" alt="Presión social" class="mb-3" style="height: 50px;">
+                </div>
+
+                <div class="col-4 d-flex justify-content-center align-items-center" >
+                    <div class="form-group">
+                        <div class="form-group form-check">
+                            <input type="checkbox" name="SWALLOWING_DIFFICULTY" id="SWALLOWING_DIFFICULTY" class="form-check-input" value="1" {% if SWALLOWING_DIFFICULTY == '1' %}checked{% endif %}>
+                            <label for="SWALLOWING_DIFFICULTY">Disfagia</label>
+                        </div>                     
+                    </div>
+                </div>
+
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque la casilla si tiene dificultad para tragar alimentos sólidos o líquidos.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!--Campo FATIGUE-->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/fatigue.jpg' %}" alt="Fatiga" class="mb-3" style="height: 70px;">
+                </div>
+
+                <div class="col-4 d-flex justify-content-center align-items-center" >
+                    <div class="form-group">
+                        <div class="form-group form-check">
+                            <input type="checkbox" name="FATIGUE" id="FATIGUE" class="form-check-input" value="1" {% if FATIGUE == '1' %}checked{% endif %}>
+                            <label for="FATIGUE">Fatiga</label>
+                        </div>                     
+                    </div>
+                </div>
+
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque la casilla si se siente cansado o fatigado con frecuencia.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!--Campo CHEST_PAIN-->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/chest-pain.jpg' %}" alt="Dolor de pecho" class="mb-3" style="height: 70px;">
+                </div>
+                <div class="col-4">
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="CHEST_PAIN" id="CHEST_PAIN" class="form-check-input" value="1" {% if CHEST_PAIN == '1' %}checked{% endif %}>
+                        <label for="CHEST_PAIN">Dolor de pecho</label>
+                    </div>
+                </div>
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque la casilla si ha experimentado dolor en el pecho.
+                    </p>
+                </div>
+            </div>
+
+
+            <!--Campo ALLERGY-->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/alergia-respiratoria.jpg' %}" alt="ANsiedad" class="mb-3" style="height: 70px;">
+                </div>
+                <div class="col-4">
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="ALLERGY" id="ALLERGY" class="form-check-input" value="1" {% if ALLERGY == '1' %}checked{% endif %}>
+                        <label for="ALLERGY">Alergias respiratorias</label>
+                    </div>
+                </div>
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque la casilla si tiene alergias respiratorias, como rinitis alérgica, asma, alergias a los ácaros del polvo, alergias a los animales, alergias al polen, entre otras.
+                    </p>
+                </div>
+            </div>
+
+
+                        <!-- Botón para continuar -->
+            <div class="d-flex align-items-start justify-content-center mt-4">
+                <div class="col-4">
+                    <button type="button" class="btn btn-secondary" style="width: 150px;" onclick="history.back();">Atrás</button>
+
+                </div>
+                <div class="col-4">
+                    <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+                </div>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary" style="width: 150px;">Siguiente</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+
+</div>
+{% endblock %}

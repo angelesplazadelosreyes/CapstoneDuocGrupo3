@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paso 2 - Datos Adicionales{% endblock %}
+
+{% block content %}
+<div class="container mt-0" style="max-width: 1000px;">
+    <div class="shadow-sm p-4 mb-4 text-center" style="background-color: #f9f9f9; border-radius: 15px; border: 2px solid #007BFF;">
+        <h2 class="text-center text-primary">Paso 2: Datos Adicionales</h2>
+    </div>
+
+    <div class="shadow-sm p-4 mb-4 text-center" style="background-color: #f9f9f9; border-radius: 15px; border: 2px solid #007BFF;">
+        <form method="post">
+            {% csrf_token %}
+
+            <!--Campo PEER_PRESSURE-->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/peer-pressure.jpg' %}" alt="Presión social" class="mb-3" style="height: 50px;">
+                </div>
+
+                <div class="col-4 d-flex justify-content-center align-items-center" >
+                    <div class="form-group">
+                        <div class="form-group form-check">
+                            <input type="checkbox" name="PEER_PRESSURE" id="peer_pressure" class="form-check-input" value="1" {% if PEER_PRESSURE == '1' %}checked{% endif %}>
+                            <label for="peer_pressure">Presión de Grupo</label>
+                        </div>                     
+                    </div>
+                </div>
+
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        ¿Ha sentido presión por parte de sus amigos o familiares para realizar alguna actividad? Si es así, marque la casilla.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!--Campo ALCOHOL_CONSUMING-->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/alcohol.png' %}" alt="Alcohol" class="mb-3" style="height: 70px;">
+                </div>
+
+                <div class="col-4 d-flex justify-content-center align-items-center" >
+                    <div class="form-group">
+                        <div class="form-group form-check">
+                            <input type="checkbox" name="ALCOHOL_CONSUMING" id="alcohol_consuming" class="form-check-input" value="1" {% if ALCOHOL_CONSUMING == '1' %}checked{% endif %}>
+                            <label for="alcohol_consuming">Consumo de Alcohol</label>
+                        </div>                     
+                    </div>
+                </div>
+
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque la casilla si consume alcohol ya sea de forma esporádica o frecuente.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!--Campo ANXIETY-->
+            <div class="form-group row align-items-center justify-content-center" style="margin-top: -20px; margin-left: 5px; margin-right: 5px;">
+                <div class="col-1">
+                    <img src="{% static 'images/anxiety.jpg' %}" alt="ANsiedad" class="mb-3" style="height: 70px;">
+                </div>
+                <div class="col-4">
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="ANXIETY" id="ANXIETY" class="form-check-input" value="1" {% if ANXIETY == '1' %}checked{% endif %}>
+                        <label for="anxiety">Ansiedad</label>
+                    </div>
+                </div>
+                <div class="col-7" style="font-size: small; background-color: #dfdfdd; border-radius: 5px; border: 1px solid #c2c3c4; display: flex; flex-direction: column; justify-content: center; text-align: justify;">
+                    <p>
+                        Marque esta casilla si es fumador, sin importar el número de cigarrillos que consume. Si no fuma, déjela desmarcada.
+                    </p>
+                </div>
+            </div>
+
+
+                        <!-- Botón para continuar -->
+            <div class="d-flex align-items-start justify-content-center mt-4">
+                <div class="col-4">
+                    <button type="button" class="btn btn-secondary" style="width: 150px;" onclick="history.back();">Atrás</button>
+
+                </div>
+                <div class="col-4">
+                    <a href="{% url 'home' %}" class="btn btn-primary" style="width: 150px;"><i class="bi bi-house"></i> Home</a>
+                </div>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary" style="width: 150px;">Siguiente</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+
+</div>
+{% endblock %}

@@ -13,7 +13,6 @@ from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
-from django.shortcuts import redirect
 
 from .forms import PatientDataForm
 from .models import PredictionHistory
@@ -42,7 +41,7 @@ def generate_pdf_data(patient_data, prediction_result, prediction_proba):
         ("Dolor en el pecho", patient_data.CHEST_PAIN),
     ]
     positive_factors = [name for name, value in factors if value == 1]
-    
+    print(f"DEBUG - Parámetro recibido en el request: step={request.GET.get('step')} | Backend step={current_step}")
 
 
     return {
@@ -60,6 +59,70 @@ def generate_pdf_data(patient_data, prediction_result, prediction_proba):
 
 
 ### Vistas Principales ###
+
+
+def patient_data_form_guided(request):
+    """
+    Vista para manejar el formulario guiado paso a paso.
+    """
+    try:
+        current_step = int(request.GET.get('step', 1))
+        print(f"Valor recibido para step: {request.GET.get('step')}")
+    except ValueError:
+        current_step = 1
+        print("Error: Paso inválido recibido. Reiniciando al paso 1.")
+
+    total_steps = 9  # Número total de pasos
+    current_step = int(request.GET.get('step', 1))  # Obtener el paso actual desde el parámetro GET
+
+    # Inicializar los datos de sesión si no existen
+    if 'patient_data' not in request.session:
+        request.session['patient_data'] = {}
+        print("Inicializando sesión para datos del paciente.")
+
+    # Obtener datos de la sesión
+    session_data = request.session['patient_data']
+    print(f"Paso actual: {current_step}, Datos actuales en la sesión: {session_data}")
+
+    # Validación básica para `AGE` en el primer paso
+    if current_step == 1 and request.method == 'POST':
+        if not request.POST.get('AGE'):
+            return render(request, 'core/patient_data_form_guided.html', {
+                'form': PatientDataForm(initial=session_data),
+                'current_step': current_step,
+                'total_steps': total_steps,
+                'error': "El campo AGE es obligatorio.",
+            })
+
+    # Manejo del envío del formulario
+    if request.method == 'POST':
+        form = PatientDataForm(request.POST)
+        if form.is_valid():
+            session_data.update(form.cleaned_data)  # Actualizar los datos en la sesión
+            request.session['patient_data'] = session_data
+
+            # Si es el último paso, realizar la predicción
+            if current_step == total_steps:
+                return perform_prediction(request, session_data)
+
+            # Redirigir al siguiente paso
+            return redirect(f"{request.path}?step={current_step + 1}")
+
+        # Si el formulario no es válido, regresar el error
+        return render(request, 'core/patient_data_form_guided.html', {
+            'form': form,
+            'current_step': current_step,
+            'total_steps': total_steps,
+            'error': "Por favor corrige los errores en el formulario.",
+        })
+
+    # Si es una solicitud GET, cargar el formulario con los datos actuales
+    form = PatientDataForm(initial=session_data)
+    return render(request, 'core/patient_data_form_guided.html', {
+        'form': form,
+        'current_step': current_step,
+        'total_steps': total_steps,
+    })
 
 def perform_prediction(request, session_data):
     """
@@ -294,199 +357,3 @@ def success_view(request):
     Vista de éxito.
     """
     return render(request, 'core/success.html')
-
-
-def step1(request):
-    """
-    Vista para la primera card del formulario guiado.
-    """
-    if 'patient_data' not in request.session:
-        request.session['patient_data'] = {}
-
-    if request.method == 'POST':
-        # Guardar datos en la sesión como enteros
-        request.session['patient_data']['AGE'] = int(request.POST.get('AGE', 0))  # Convertimos AGE a número
-        request.session['patient_data']['GENDER'] = int(request.POST.get('GENDER', 0))  # Convertimos GENDER a número
-        request.session['patient_data']['SMOKING'] = int(request.POST.get('SMOKING', 0))  # Convertimos SMOKING a número
-        request.session['patient_data']['YELLOW_FINGERS'] = int(request.POST.get('YELLOW_FINGERS', 0))  # Convertimos YELLOW_FINGERS a número
-
-        # Redirigir al siguiente paso
-        return redirect('core:step2')
-
-    # Renderizar la plantilla para la card 1
-    return render(request, 'core/step1.html', {
-        'AGE': request.session['patient_data'].get('AGE', ''),
-        'GENDER': request.session['patient_data'].get('GENDER', ''),
-        'SMOKING': request.session['patient_data'].get('SMOKING', ''),
-        'YELLOW_FINGERS': request.session['patient_data'].get('YELLOW_FINGERS', ''),
-    })
-
-
-
-def step2(request):
-    """
-    Vista para el paso 2 del formulario guiado.
-    Maneja los campos: PEER_PRESSURE, ALCOHOL_CONSUMING, ANXIETY.
-    """
-    if 'patient_data' not in request.session:
-        request.session['patient_data'] = {}
-
-
-    if request.method == 'POST':
-        # Actualizar la sesión con los datos enviados
-        request.session['patient_data']['PEER_PRESSURE'] = int(request.POST.get('PEER_PRESSURE', 0))
-        request.session['patient_data']['ALCOHOL_CONSUMING'] = int(request.POST.get('ALCOHOL_CONSUMING', 0))
-        request.session['patient_data']['ANXIETY'] = int(request.POST.get('ANXIETY', 0))
-
-        # Redirigir al siguiente paso
-        return redirect('core:step3')
-
-    # Renderizar el formulario con los datos actuales de la sesión
-    data = request.session.get('patient_data', {})
-    return render(request, 'core/step2.html', data)
-
-
-
-def step3(request):
-    """
-    Vista para el paso 3 del formulario guiado.
-    """
-    if 'patient_data' not in request.session:
-        request.session['patient_data'] = {}
-
-
-    if request.method == 'POST':
-        # Guardar datos en la sesión
-        request.session['patient_data']['SWALLOWING_DIFFICULTY'] = int(request.POST.get('SWALLOWING_DIFFICULTY', 0))
-        request.session['patient_data']['FATIGUE'] = int(request.POST.get('FATIGUE', 0))
-        request.session['patient_data']['CHEST_PAIN'] = int(request.POST.get('CHEST_PAIN', 0))
-        request.session['patient_data']['ALLERGY'] = int(request.POST.get('ALLERGY', 0))
-        request.session.modified = True  # Marcar la sesión como modificada
-
-        # Redirigir al paso 4
-        return redirect('core:step4')
-
-    # Renderizar la plantilla del paso 3
-    return render(request, 'core/step3.html', {
-        'patient_data': request.session.get('patient_data', {})
-    })
-
-
-
-def step4(request):
-    """
-    Vista para el paso 4 del formulario guiado.
-    """
-    if 'patient_data' not in request.session:
-        request.session['patient_data'] = {}
-
-    if request.method == 'POST':
-        # Guardar datos en la sesión
-        request.session['patient_data']['COUGHING'] = int(request.POST.get('COUGHING', 0))
-        request.session['patient_data']['CHRONIC_DISEASE'] = int(request.POST.get('CHRONIC_DISEASE', 0))
-        request.session['patient_data']['SHORTNESS_OF_BREATH'] = int(request.POST.get('SHORTNESS_OF_BREATH', 0))
-        request.session['patient_data']['WHEEZING'] = int(request.POST.get('WHEEZING', 0))
-        request.session.modified = True  # Marcar la sesión como modificada
-
-        # Redirigir al resumen
-        return redirect('core:summary')
-
-    # Renderizar la plantilla del paso 4
-    return render(request, 'core/step4.html', {
-        'patient_data': request.session.get('patient_data', {})
-    })
-
-
-
-def summary(request):
-    """
-    Vista para mostrar el resumen de los datos ingresados y realizar la predicción.
-    """
-    model_path = os.path.join(os.path.dirname(__file__), 'modelo_random_forest.pkl')
-
-    try:
-        model = joblib.load(model_path)
-    except FileNotFoundError:
-        print("Modelo no encontrado.")
-        model = None
-
-    if request.method == 'POST' and model:
-        # Recuperar los datos de la sesión
-        data = np.array([[
-            int(request.session.get('GENDER', 0)),
-            int(request.session.get('AGE', 0)),
-            int(request.session.get('SMOKING', 0)),
-            int(request.session.get('YELLOW_FINGERS', 0)),
-            int(request.session.get('ANXIETY', 0)),
-            int(request.session.get('PEER_PRESSURE', 0)),
-            int(request.session.get('CHRONIC_DISEASE', 0)),
-            int(request.session.get('FATIGUE', 0)),
-            int(request.session.get('ALLERGY', 0)),
-            int(request.session.get('WHEEZING', 0)),
-            int(request.session.get('ALCOHOL_CONSUMING', 0)),
-            int(request.session.get('COUGHING', 0)),
-            int(request.session.get('SHORTNESS_OF_BREATH', 0)),
-            int(request.session.get('SWALLOWING_DIFFICULTY', 0)),
-            int(request.session.get('CHEST_PAIN', 0)),
-        ]])
-
-        prediction_result = model.predict(data)[0]
-        prediction_proba = model.predict_proba(data)[0][1]
-        if prediction_proba == 1:
-            prediction_proba = 0.9997
-        elif prediction_proba == 0:
-            prediction_proba = 0.0001
-
-        # Generar datos para el PDF si es necesario
-        pdf_data = generate_pdf_data(request.session, prediction_result, prediction_proba)
-        request.session.update(pdf_data)
-
-        return render(request, 'core/prediction_result.html', {
-            'prediction_result': prediction_result,
-            'prediction_proba': prediction_proba * 100,
-            'positive_factors': pdf_data["positive_factors"],
-        })
-
-    # Si no es POST, simplemente mostrar los datos en el resumen
-    return render(request, 'core/summary.html', {
-        'patient_data': request.session,
-    })
-
-def process_guided_form(request):
-    """
-    Vista para procesar el formulario guiado y generar la predicción.
-    """
-    if request.method == 'POST':
-        patient_data = request.session.get('patient_data', {})
-        
-        # Cargar el modelo
-        model_path = os.path.join(os.path.dirname(__file__), 'modelo_random_forest.pkl')
-        try:
-            model = joblib.load(model_path)
-        except FileNotFoundError:
-            print("Modelo no encontrado.")
-            return render(request, 'core/error.html', {'message': 'Modelo no encontrado.'})
-
-        # Convertir los datos en un array para el modelo
-        data = np.array([[  
-            patient_data.get('GENDER'), patient_data.get('AGE'), patient_data.get('SMOKING'), patient_data.get('YELLOW_FINGERS'),
-            patient_data.get('ANXIETY'), patient_data.get('PEER_PRESSURE'), patient_data.get('CHRONIC_DISEASE'), patient_data.get('FATIGUE'),
-            patient_data.get('ALLERGY'), patient_data.get('WHEEZING'), patient_data.get('ALCOHOL_CONSUMING'), patient_data.get('COUGHING'),
-            patient_data.get('SHORTNESS_OF_BREATH'), patient_data.get('SWALLOWING_DIFFICULTY'), patient_data.get('CHEST_PAIN')
-        ]])
-
-        # Hacer la predicción
-        prediction_result = model.predict(data)[0]
-        prediction_proba = model.predict_proba(data)[0][1]
-        if prediction_proba == 1:
-            prediction_proba = 0.9997
-        elif prediction_proba == 0:
-            prediction_proba = 0.0001
-
-        return render(request, 'core/prediction_result.html', {
-            'prediction_result': prediction_result,
-            'prediction_proba': prediction_proba * 100,
-        })
-
-    return redirect('core:summary')
-

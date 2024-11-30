@@ -150,3 +150,9 @@ SESSION_SAVE_EVERY_REQUEST = True # Renueva la sesión en cada solicitud
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Configuración de sesiones
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Almacenar sesiones en la base de datos
+SESSION_COOKIE_HTTPONLY = True  # Seguridad adicional para las cookies
+SESSION_COOKIE_SECURE = DEBUG is False  # Asegura cookies en HTTPS en producción
+SESSION_SAVE_EVERY_REQUEST = True  # Guarda la sesión en cada solicitud
