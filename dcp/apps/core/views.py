@@ -447,10 +447,36 @@ def summary(request):
             'positive_factors': pdf_data["positive_factors"],
         })
 
-    # Si no es POST, simplemente mostrar los datos en el resumen
+    # Traducción de las claves y valores para la plantilla
+    translations = {
+        'AGE': 'Edad',
+        'GENDER': 'Género',
+        'SMOKING': '¿Fuma?',
+        'YELLOW_FINGERS': '¿Dedos amarillos?',
+        'PEER_PRESSURE': '¿Presión de grupo?',
+        'ALCOHOL_CONSUMING': '¿Consume alcohol?',
+        'ANXIETY': '¿Ansiedad?',
+        'SWALLOWING_DIFFICULTY': '¿Dificultad para tragar?',
+        'FATIGUE': '¿Fatiga?',
+        'CHEST_PAIN': '¿Dolor en el pecho?',
+        'ALLERGY': '¿Alergia?',
+        'COUGHING': '¿Tos?',
+        'CHRONIC_DISEASE': '¿Enfermedad crónica?',
+        'SHORTNESS_OF_BREATH': '¿Dificultad para respirar?',
+        'WHEEZING': '¿Sibilancias?',
+    }
+
+    patient_data = {
+        translations.get(k, k): ('Sí' if v == 1 else 'No' if v == 0 else v)
+        for k, v in request.session.items()
+    }
+
+    # Renderizar la plantilla con los datos traducidos
     return render(request, 'core/summary.html', {
-        'patient_data': request.session,
+        'patient_data': patient_data,
     })
+
+
 
 def process_guided_form(request):
     """
